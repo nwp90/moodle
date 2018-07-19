@@ -1362,7 +1362,7 @@ class coursecat implements renderable, cacheable_object, IteratorAggregate {
         $cachekey = 's-'. serialize(
             $search + array('sort' => $sortfields) + array('requiredcapabilities' => $requiredcapabilities)
         );
-        $cntcachekey = 'scnt-'. serialize($search);
+        $cntcachekey = 'scnt-'. serialize($search) . serialize($requiredcapabilities);
 
         $ids = $coursecatcache->get($cachekey);
         if ($ids !== false) {
