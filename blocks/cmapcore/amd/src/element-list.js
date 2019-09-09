@@ -6,6 +6,7 @@ define([
   ajax
 ) {
   var initialized = false;
+  var mapbase = 'https://medmap.otago.ac.nz';
 
   function matchTagList(presentations) {
     var pres;
@@ -33,7 +34,7 @@ define([
     });
   }
   
-  function getElements(elementtype, mapbase, shortname) {
+  function getModuleElements(elementtype, moduleUrl) {
     var elements = [];
     var config = {
       p: {
@@ -59,9 +60,9 @@ define([
       }
     }
       
-    if (shortname && mapbase) {
+    if (moduleUrl) {
       // currently, page_size=all gets rid of count, next, prev etc...
-      var elementUrl = mapbase + '/cmapapi/modules/' + shortname + '/' + config[elementtype].linkname + '/?format=json&linkage=strong&page_size=999';
+      var elementUrl = moduleUrl + '/' + config[elementtype].linkname + '/?format=json&linkage=strong&page_size=999';
 
       var elementdivstring = '#cmap-' + config[elementtype].abbrev + '-div';
       var elementdiv = $(elementdivstring);
@@ -69,7 +70,7 @@ define([
       var elementlist = elementdiv.find('.elementlist');
       var loadingmsg = elementdiv.find('.loading');
 
-      console.log("showing loadingmsg for " + elementtype);
+      //console.log("showing loadingmsg for " + elementtype);
       loadingmsg.show();
       $.getJSON(elementUrl, function(data) {
 	var items = [];
@@ -102,35 +103,63 @@ define([
     }
   }
 
-  return ({
-    init: function(mapbase, courseid, shortname) {
-      if (!this.initialized) {
-	$('.pres-loading').show();
-
-	if (typeof(mapbase) === 'undefined') {
-	  mapbase = 'https://medmap.otago.ac.nz';
-	}
-
+  
+  function getAllElements(shortname) {
+    return (
+      function (siteversionData, textStatus, jqXHR) {
+	var modulesversionUrl = siteversionData.modulesversion.url;
+	
 	// Check whether module exists in map before trying to get elements;
 	// if it doesn't, hide the CMap block unless editing is on.
 	//
 	// Ideally this would probably be done in the block PHP, and we would
 	// never even get called when the module doesn't make sense.
 	//
-	var courseUrl = mapbase + '/cmapapi/modules/' + shortname + '/';
+	var courseUrl = modulesversionUrl + 'modules/' + shortname + '/';
 	var cmapcore = $(".block.block_cmapcore:not(.block_with_controls)");
 	$.ajax({
 	  url: courseUrl,
-	  success: function(data, textStatus, jqXHR) {
-	    console.log("got data: ", data);
+	  success: function(moduleData, textStatus, jqXHR) {
+	    //console.log("got data: ", moduleData);
 	    cmapcore.show();
-	    getElements('p', mapbase, shortname);
-	    getElements('c', mapbase, shortname);
-	    getElements('a', mapbase, shortname);
+	    getModuleElements('p', moduleData.url);
+	    getModuleElements('c', moduleData.url);
+	    getModuleElements('a', moduleData.url);
 	  },
 	  statusCode: {
 	    404: function() {
-	      console.log("module '" + shortname + "' not found in cmap");
+	      console.log("module '" + shortname + "' not found in cmap default site version");
+	      cmapcore.hide();
+	    }
+	  }
+	});
+      }
+    );
+  }
+    
+  return ({
+    init: function(mapbase, courseid, shortname) {
+      if (!this.initialized) {
+	$('.pres-loading').show();
+
+	if (typeof(mapbase) !== 'undefined') {
+	  this.mapbase = mapbase;
+	}
+
+	var svUrl = this.mapbase + '/cmapapi/siteversions/default/';
+
+	// getAllEvents *returns* the callback function, which is called
+	// with (siteversionData, textStatus, jqXHR)
+	$.ajax({
+	  url: svUrl,
+	  success: getAllElements(shortname),
+	  statusCode: {
+	    404: function() {
+	      console.log("default site version not found in cmap");
+	      cmapcore.hide();
+	    },
+	    500: function() {
+	      console.log("error fetching default site version from cmap");
 	      cmapcore.hide();
 	    }
 	  }
