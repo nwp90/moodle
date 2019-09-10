@@ -1,3 +1,10 @@
+moodle-site-otagounifom (3.6.6.2019090900+0facmed1-1) stretch; urgency=medium
+
+  * New upstream version
+  * Update cmapcore block for new versioned cmap api
+
+ -- Nick Phillips <nwp@debian.org>  Tue, 10 Sep 2019 13:58:49 +1200
+
 moodle-site-otagounifom (3.6.5.2019071800+0facmed1-1) stretch; urgency=medium
 
   * Security & more upstream updates
