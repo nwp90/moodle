@@ -30,11 +30,22 @@ require_once('lib.php');
 redirect_if_major_upgrade_required();
 
 $testsession = optional_param('testsession', 0, PARAM_INT); // test session works properly
-$anchor      = optional_param('anchor', '', PARAM_RAW);      // Used to restore hash anchor to wantsurl.
+$anchor      = optional_param('anchor', '', PARAM_RAW);     // Used to restore hash anchor to wantsurl.
 
 $resendconfirmemail = optional_param('resendconfirmemail', false, PARAM_BOOL);
 $noredirect  = optional_param('magicpony', 0, PARAM_BOOL); // don't redirect
 $noredirect |= optional_param('noredirect', 0, PARAM_BOOL); // don't redirect
+
+// It might be safe to do this for non-Behat sites, or there might
+// be a security risk. For now we only allow it on Behat sites.
+// If you wants to do the analysis, you may be able to remove the
+// if (BEHAT_SITE_RUNNING).
+if (defined('BEHAT_SITE_RUNNING') && BEHAT_SITE_RUNNING) {
+    $wantsurl    = optional_param('wantsurl', '', PARAM_LOCALURL);   // Overrides $SESSION->wantsurl if given.
+    if ($wantsurl !== '') {
+        $SESSION->wantsurl = (new moodle_url($wantsurl))->out(false);
+    }
+}
 
 $context = context_system::instance();
 $PAGE->set_url("$CFG->wwwroot/login/index.php");
