@@ -1,3 +1,9 @@
+moodle-site-otagounifom (3.8.0.2019111200.0facmed0-1) buster; urgency=medium
+
+  * Reapply our patches to Moodle 3.8beta & rebuild JS
+
+ -- Nick Phillips <nwp@debian.org>  Fri, 15 Nov 2019 11:54:34 +1300
+
 moodle-site-otagounifom (3.6.6.2019101800+0facmed1-2) buster; urgency=medium
 
   * Fix dependencies (PHP versions)
