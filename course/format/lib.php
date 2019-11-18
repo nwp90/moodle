@@ -697,6 +697,9 @@ abstract class format_base {
             if (!isset($option['element_type'])) {
                 $option['element_type'] = 'text';
             }
+            if (!array_key_exists($option, 'label')) {
+                error_log("key 'label' missing from option array: " . print_r($option, true));
+            }
             $args = array($option['element_type'], $optionname, $option['label']);
             if (!empty($option['element_attributes'])) {
                 $args = array_merge($args, $option['element_attributes']);
