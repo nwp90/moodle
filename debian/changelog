@@ -1,3 +1,9 @@
+moodle-site-otagounifom (3.6.7.2019111100+0facmed1-1) buster; urgency=medium
+
+  * New upstream version, security release.
+
+ -- Nick Phillips <nwp@debian.org>  Tue, 19 Nov 2019 12:29:53 +1300
+
 moodle-site-otagounifom (3.6.6.2019101800+0facmed1-2) buster; urgency=medium
 
   * Fix dependencies (PHP versions)
