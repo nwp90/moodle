@@ -4,6 +4,7 @@
     margin-left: 2px;
     margin-right: 2px;
     padding: 5px;
+    display: inline-block;
 }
 
 .path-mod-attendance .attcurbtn {
@@ -16,7 +17,7 @@
     margin-bottom: 10px;
     margin-left: auto;
     margin-right: auto;
-    width: 90%;
+/*    width: 90%; */
 }
 
 .path-mod-attendance .attfiltercontrols #currentdate {
@@ -105,8 +106,26 @@
     background-color: #eee;
     padding: 30px 10px;
 }
+.path-mod-attendance table.userinfobox .userpicture {
+    margin: 0;
+}
 .path-mod-attendance table.attlist td.c0 {
     text-align: right;
+}
+.path-mod-attendance table.allsessions tr.grouper td {
+    background-color: #eeeeee;
+}
+.path-mod-attendance table.allsessions td.groupheading {
+    font-weight: bold;
+}
+.path-mod-attendance .allsessionssummary > * {
+    display: inline-block;
+}
+.path-mod-attendance .allsessionssummary .float-right {
+    float: right;
+}
+.path-mod-attendance .allsessionssummary .float-left {
+    float: left;
 }
 
 #page-mod-attendance-preferences .generalbox {
@@ -261,7 +280,7 @@
 #page-mod-attendance-report .attendancereporttable .headcol {
     position: absolute;
     width: 200px;
-    left: 10px;
+    left: 15px;
     top: auto;
     border-top-width: 1px;
 }
@@ -276,20 +295,20 @@
 }
 
 /* CSS for old clean based themes with docks etc. */
-#page-mod-attendance-report.has-region-side-pre .attendancereporttable .headcol {
+#page-mod-attendance-report.has-region-side-pre:not(.empty-region-side-pre) .attendancereporttable .headcol {
     left: 370px;
 }
 
-#page-mod-attendance-report.has-region-side-pre .attendancereporttable {
+#page-mod-attendance-report.has-region-side-pre:not(.empty-region-side-pre) .attendancereporttable {
     margin-left: 230px;
 }
 
-#page-mod-attendance-report.has-region-side-pre.content-only .attendancereporttable .headcol {
+#page-mod-attendance-report.has-region-side-pre:not(.empty-region-side-pre).content-only .attendancereporttable .headcol {
     left: 80px;
 }
 
 @media (max-width: 767px) {
-    #page-mod-attendance-report.has-region-side-pre .attendancereporttable .headcol {
+    #page-mod-attendance-report.has-region-side-pre:not(.empty-region-side-pre) .attendancereporttable .headcol {
         left: 80px;
     }
 }
