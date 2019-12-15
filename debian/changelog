@@ -1,3 +1,9 @@
+moodle-site-otagounifom (3.8.0.2019121200.0facmed0-1) buster; urgency=medium
+
+  * New upstream version
+
+ -- Nick Phillips <nwp@debian.org>  Mon, 16 Dec 2019 10:13:06 +1300
+
 moodle-site-otagounifom (3.8.0.2019111200.0facmed0-1) buster; urgency=medium
 
   * Reapply our patches to Moodle 3.8beta & rebuild JS
