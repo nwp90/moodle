@@ -174,8 +174,6 @@ class format_medschool_topics_renderer extends format_section_renderer_base {
     function section_header($section, $course, $onsectionpage, $sectionreturn=null) {
         global $CFG, $DB;
 
-        require_once($CFG->libdir. '/coursecatlib.php');
-
         if ($section->section !== 0) {
             return parent::section_header($section, $course, $onsectionpage, $sectionreturn);
         }
@@ -186,7 +184,7 @@ class format_medschool_topics_renderer extends format_section_renderer_base {
 
         // This (get_course) merges format options into course object,
         // so no need to call get_format_options later or maintain separate variable
-        $course = new course_in_list($fmt->get_course());
+        $course = new core_course_list_element($fmt->get_course());
         $num_sections = $course->numsections;
         $single_section_link = $course->navigationsectionlink;
         $course_url = $CFG->wwwroot.'/course/view.php?id='.$course->id;

@@ -11822,6 +11822,7 @@ body.h5p-embed .h5pmessages {
 
 .toast-wrapper {
   max-width: 350px;
+  max-height: 0;
   z-index: 1051; }
 
 .icon {
@@ -16529,6 +16530,9 @@ select {
 .path-mod-forum .forumheaderlist .discussion .replies,
 .path-mod-forum .forumheaderlist .discussion .lastpost {
   vertical-align: top; }
+
+.path-mod-forum .discussion-list .topic {
+  font-weight: inherit; }
 
 .path-mod-forum .subscriptionmode {
   color: #373a3c; }
