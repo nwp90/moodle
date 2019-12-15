@@ -8,6 +8,7 @@ admin                          /srv/moodle/otagounifom/moodle/
 analytics		       /srv/moodle/otagounifom/moodle/
 auth                           /srv/moodle/otagounifom/moodle/
 availability                   /srv/moodle/otagounifom/moodle/
+babel-plugin-add-module-to-define.js /srv/moodle/otagounifom/moodle/
 backup                         /srv/moodle/otagounifom/moodle/
 badges                         /srv/moodle/otagounifom/moodle/
 behat.yml.dist                 /srv/moodle/otagounifom/moodle/
@@ -23,6 +24,7 @@ completion                     /srv/moodle/otagounifom/moodle/
 composer.json                  /srv/moodle/otagounifom/moodle/
 config-dist.php                /srv/moodle/otagounifom/moodle/
 course                         /srv/moodle/otagounifom/moodle/
+customfield                    /srv/moodle/otagounifom/moodle/
 dataformat                     /srv/moodle/otagounifom/moodle/
 draftfile.php                  /srv/moodle/otagounifom/moodle/
 enrol                          /srv/moodle/otagounifom/moodle/
@@ -34,6 +36,7 @@ files                          /srv/moodle/otagounifom/moodle/
 filter                         /srv/moodle/otagounifom/moodle/
 grade                          /srv/moodle/otagounifom/moodle/
 group                          /srv/moodle/otagounifom/moodle/
+h5p                            /srv/moodle/otagounifom/moodle/
 help.php                       /srv/moodle/otagounifom/moodle/
 help_ajax.php                  /srv/moodle/otagounifom/moodle/
 index.php                      /srv/moodle/otagounifom/moodle/
