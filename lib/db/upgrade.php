@@ -3762,5 +3762,41 @@ function xmldb_main_upgrade($oldversion) {
         upgrade_main_savepoint(true, 2019103000.13);
     }
 
+    if ($oldversion < 2019111300.00) {
+
+        // Define field coremajor to be added to h5p_libraries.
+        $table = new xmldb_table('h5p_libraries');
+        $field = new xmldb_field('coremajor', XMLDB_TYPE_INTEGER, '4', null, null, null, null, 'addto');
+
+        // Conditionally launch add field coremajor.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        $field = new xmldb_field('coreminor', XMLDB_TYPE_INTEGER, '4', null, null, null, null, 'coremajor');
+
+        // Conditionally launch add field coreminor.
+        if (!$dbman->field_exists($table, $field)) {
+            $dbman->add_field($table, $field);
+        }
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2019111300.00);
+    }
+
+    // Automatically generated Moodle v3.8.0 release upgrade line.
+    // Put any upgrade step following this.
+
+    if ($oldversion < 2019111800.04) {
+        // Delete any tool_cohortroles mappings for roles which no longer exist.
+        $DB->delete_records_select('tool_cohortroles', "roleid NOT IN (SELECT id FROM {role})");
+
+        // Delete any role assignments for roles which no longer exist.
+        $DB->delete_records_select('role_assignments', "roleid NOT IN (SELECT id FROM {role})");
+
+        // Main savepoint reached.
+        upgrade_main_savepoint(true, 2019111800.04);
+    }
+
     return true;
 }
