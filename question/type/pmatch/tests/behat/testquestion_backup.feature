@@ -22,7 +22,10 @@ Feature: Test backup and restore of a pmatch question with responses and matches
     # Check course C1 version of uploaded responses.
     Then I should see "Pattern-match question testing tool: Testing question: My first pattern match question"
     And I should see "Showing the responses for the selected question: My first pattern match question"
-    And I should see "Pos=0/0 Neg=0/0 Unm=13 Acc=0%"
+    And I should see "Sample responses: 13"
+    And I should see "Marked correctly: 0 (0%)"
+    And I should see "Computed mark greater than human mark: 0 (missed positive)"
+    And I should see "Computed mark less than human mark: 0 (missed negative)"
     And I should see "1" in the "testing one two three four" "table_row"
     # Now mark responses in order to test their backup.
     When I set the field "tqheadercheckbox" to "1"
@@ -37,12 +40,11 @@ Feature: Test backup and restore of a pmatch question with responses and matches
     Then I should see "Course 2"
     # Check the new course's testquestion data.
     When I navigate to "Question bank" in current page administration
-    Then I should see "My first pattern match question"
-    When I follow "Edit"
+    And I choose "Edit question" action for "My first pattern match question" in the question bank
     Then I should see "Editing a Pattern match question"
     When I am on "Course 1" course homepage
     And I navigate to "Question bank" in current page administration
-    And I follow "Preview"
+    When I choose "Preview" action for "My first pattern match question" in the question bank
     And I switch to "questionpreview" window
     And I follow "Test this question"
     # Final check that the marked responses have been restored properly.
@@ -51,4 +53,7 @@ Feature: Test backup and restore of a pmatch question with responses and matches
     And I should see "1" in the "#qtype-pmatch-testquestion_r0_c4" "css_element"
     And I should see "1" in the "#qtype-pmatch-testquestion_r0_c3" "css_element"
     And I should see "1" in the "#qtype-pmatch-testquestion_r0_c2" "css_element"
-    And I should see "Pos=1/6 Neg=6/6 Unm=1 Acc=58%"
+    And I should see "Sample responses: 13"
+    And I should see "Marked correctly: 7 (54%)"
+    And I should see "Computed mark greater than human mark: 0 (missed positive)"
+    And I should see "Computed mark less than human mark: 5 (missed negative)"

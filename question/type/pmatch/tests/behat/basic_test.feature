@@ -21,20 +21,21 @@ Feature: Test all the basic functionality of pmatch question type
   Scenario: Create, edit then preview a pattern match question.
     # Create a new question.
     And I add a "Pattern match" question filling the form with:
-      | Question name                 | My first pattern match question           |
-      | Question text                 | Listen, translate and write               |
-      | id_synonymsdata_0_word        | any                                       |
-      | id_synonymsdata_0_synonyms    | "testing\|one\|two\|three\|four"          |
-      | Answer 1                      | match (testing one two three four)        |
-      | id_fraction_0                 | 100%                                      |
-      | id_feedback_0                 | Well done!                                |
-      | id_otherfeedback              | Sorry, no.                                |
-      | Hint 1                        | Please try again.                         |
-      | Hint 2                        | Use a calculator if necessary.            |
+      | Question name                 | My first pattern match question    |
+      | Question text                 | Listen, translate and write        |
+      | Spell checking                | Do not check spelling of student   |
+      | id_synonymsdata_0_word        | any                                |
+      | id_synonymsdata_0_synonyms    | "testing\|one\|two\|three\|four"   |
+      | Answer 1                      | match (testing one two three four) |
+      | id_fraction_0                 | 100%                               |
+      | id_feedback_0                 | Well done!                         |
+      | id_otherfeedback              | Sorry, no.                         |
+      | Hint 1                        | Please try again.                  |
+      | Hint 2                        | Use a calculator if necessary.     |
     Then I should see "My first pattern match question"
 
     # Preview it. Test correct and incorrect answers.
-    When I click on "Preview" "link" in the "My first pattern match question" "table_row"
+    When I choose "Preview" action for "My first pattern match question" in the question bank
     And I switch to "questionpreview" window
 
     And I set the following fields to these values:
@@ -68,7 +69,7 @@ Feature: Test all the basic functionality of pmatch question type
     Then I should see "My first pattern match question"
 
     # Edit the copy and verify the form field contents.
-    When I click on "Edit" "link" in the "My first pattern match question" "table_row"
+    When I choose "Edit question" action for "My first pattern match question" in the question bank
     Then the following fields match these values:
       | Question name                 | My first pattern match question           |
       | Question text                 | Listen, translate and write               |
