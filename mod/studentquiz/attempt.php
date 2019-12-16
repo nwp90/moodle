@@ -113,41 +113,39 @@ if (data_submitted()) {
         // We save the attempts always to db, as there is no finish/submission step expected for the user.
         question_engine::save_questions_usage_by_activity($questionusage);
 
-        // Only add studentquiz_progress information, if it is a studentquiz aggregated type
-        if ($studentquiz->aggregated) {
-            $qa = $questionusage->get_question_attempt($slot);
-            $q = $questionusage->get_question($slot);
+        $qa = $questionusage->get_question_attempt($slot);
+        $q = $questionusage->get_question($slot);
 
-            $studentquizprogress = $DB->get_record('studentquiz_progress', array('questionid' => $q->id,
-                'userid' => $userid, 'studentquizid' => $studentquiz->id));
-            $updatestudentquizprogress = true;
-            if ($studentquizprogress == false) {
-                $updatestudentquizprogress = false;
-                $studentquizprogress = mod_studentquiz_get_studenquiz_progress_class($q->id, $userid, $studentquiz->id);
-            }
-
-            $studentquizprogress->attempts += 1;
-
-            switch($qa->get_state()) {
-                case question_state::$gradedright:
-                    $studentquizprogress->correctattempts += 1;
-                    $studentquizprogress->lastanswercorrect = 1;
-                    break;
-                case question_state::$gradedwrong:
-                case question_state::$gradedpartial:
-                    $studentquizprogress->lastanswercorrect = 0;
-                    break;
-                case question_state::$todo:
-                default:
-                    break;
-            }
-
-            if ($updatestudentquizprogress) {
-                $DB->update_record('studentquiz_progress', $studentquizprogress);
-            } else {
-                $studentquizprogress->id = $DB->insert_record('studentquiz_progress', $studentquizprogress, true);
-            }
+        $studentquizprogress = $DB->get_record('studentquiz_progress', array('questionid' => $q->id,
+            'userid' => $userid, 'studentquizid' => $studentquiz->id));
+        $updatestudentquizprogress = true;
+        if ($studentquizprogress == false) {
+            $updatestudentquizprogress = false;
+            $studentquizprogress = mod_studentquiz_get_studenquiz_progress_class($q->id, $userid, $studentquiz->id);
         }
+
+        $studentquizprogress->attempts += 1;
+
+        switch($qa->get_state()) {
+            case question_state::$gradedright:
+                $studentquizprogress->correctattempts += 1;
+                $studentquizprogress->lastanswercorrect = 1;
+                break;
+            case question_state::$gradedwrong:
+            case question_state::$gradedpartial:
+                $studentquizprogress->lastanswercorrect = 0;
+                break;
+            case question_state::$todo:
+            default:
+                break;
+        }
+
+        if ($updatestudentquizprogress) {
+            $DB->update_record('studentquiz_progress', $studentquizprogress);
+        } else {
+            $studentquizprogress->id = $DB->insert_record('studentquiz_progress', $studentquizprogress, true);
+        }
+
 
         redirect($actionurl);
     }
@@ -221,9 +219,12 @@ $html .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cm
 // Output the question.
 $html .= $questionusage->render_question($slot, $options, (string)$slot);
 
+// Output the state change select box.
+$html .= $output->render_state_choice($question->id, $course->id, $cmid);
+
 // Output the rating.
 if ($hasanswered) {
-    $html .= $output->render_rate($question->id);
+    $html .= $output->render_rate($question->id, $studentquiz->forcerating);
 }
 
 // Finish the question form.
@@ -285,7 +286,8 @@ if ($hasanswered) {
         $ismoderator = true;
     }
 
-    $html .= $output->render_comment($cmid, $question->id, $comments, $userid, $anonymize, $ismoderator);
+    $html .= $output->render_comment($cmid, $question->id, $comments, $userid, $anonymize, $ismoderator,
+            $studentquiz->forcecommenting);
 }
 
 $html .= html_writer::end_tag('form');
