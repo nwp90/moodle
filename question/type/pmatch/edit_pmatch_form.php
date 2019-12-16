@@ -26,6 +26,8 @@ defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/question/type/pmatch/pmatchlib.php');
 
+use qtype_pmatch\local\spell\qtype_pmatch_spell_checker;
+
 /**
  * Short answer question editing form definition.
  *
@@ -88,7 +90,9 @@ class qtype_pmatch_edit_form extends question_edit_form {
 
         if (\qtype_pmatch\testquestion_responses::has_responses($this->question)) {
             $counts = \qtype_pmatch\testquestion_responses::get_question_grade_summary_counts($this->question);
-            $results = html_writer::tag('p', get_string('testquestionresultssummary', 'qtype_pmatch', $counts));
+            $results = html_writer::tag('p',
+                    get_string('testquestionresultssummary', 'qtype_pmatch', $counts),
+                    ["id" => 'testquestion_gradesummary']);
         }
         $answersinstruct = $mform->createElement('static', 'answersinstruct',
                                                 get_string('correctanswers', 'qtype_pmatch'),
@@ -130,6 +134,7 @@ class qtype_pmatch_edit_form extends question_edit_form {
             return;
         }
         $count = 0;
+        $responsestmp = $responses;
         foreach ($rules as $aid => $rule) {
             // Avoid adding anything to the 'Any other answer' section.
             if (!$mform->elementExists('fraction[' . $count . ']')) {
@@ -137,15 +142,17 @@ class qtype_pmatch_edit_form extends question_edit_form {
             }
 
             // Add the Rule accuracy section.
-            $accuracy = \qtype_pmatch\testquestion_responses::get_rule_accuracy_counts($responses, $rule->id, $matches);
-            $labelhtml = html_writer::div(get_string('ruleaccuracylabel', 'qtype_pmatch'), 'fitemtitle');
+            $accuracy = \qtype_pmatch\testquestion_responses::get_rule_accuracy_counts($responsestmp, $rule, $matches);
+            $labelhtml = html_writer::div(
+                    html_writer::label(get_string('ruleaccuracylabel', 'qtype_pmatch'), 'fitem_accuracy_' . $count),
+                    'fitemtitle');
             $elementhtml = html_writer::div(get_string('ruleaccuracy', 'qtype_pmatch', $accuracy),
                     'felement fselect', array('id' => 'fitem_accuracy_' . $count));
-            $html = html_writer::div($labelhtml. $elementhtml, 'fitem fitem_accuracy');
+            $html = html_writer::div(html_writer::div($labelhtml. $elementhtml, 'col-md-12'), 'fitem fitem_accuracy form-group row');
             $answersaccuracy = $mform->createElement('html', $html);
             $cloneanswersaccuracy = clone $answersaccuracy;
-            $mform->insertElementBefore($cloneanswersaccuracy, 'answer[' . $count . ']');
-
+            $mform->insertElementBefore($cloneanswersaccuracy, 'accuracyborder[' . $count . ']');
+            unset($cloneanswersaccuracy);
             // Add the Show coverage section - for rules that have been marked.
             if (array_key_exists($rule->id, $matches['ruleidstoresponseids'])) {
                 $items = array();
@@ -177,9 +184,7 @@ class qtype_pmatch_edit_form extends question_edit_form {
                 $reponseslist .= html_writer::alist($items);
                 $reponseslist .= print_collapsible_region_end(true);
                 $html = html_writer::div($reponseslist, 'fitem fitem_matchedresponses');
-                $matchedresponses = $mform->createElement('html', $html);
-                $clonematchedresponses = clone ($matchedresponses);
-                $mform->insertElementBefore($clonematchedresponses, 'fraction[' . $count . ']');
+                $mform->insertElementBefore($mform->createElement('html', $html), 'fraction[' . $count . ']');
             }
             $count++;
         }
@@ -231,28 +236,43 @@ class qtype_pmatch_edit_form extends question_edit_form {
         $mform->addElement('select', 'forcelength',
                                                 get_string('forcelength', 'qtype_pmatch'), $menu);
         $mform->setDefault('forcelength', 1);
-        $mform->addElement('selectyesno', 'applydictionarycheck',
-                                            get_string('applydictionarycheck', 'qtype_pmatch'));
-        $mform->setDefault('applydictionarycheck', 1);
+        list ($options, $disable) = qtype_pmatch_spell_checker::get_spell_checker_language_options($this->question);
+        if ($disable) {
+            $mform->addElement('select', 'applydictionarycheck',
+                    get_string('applydictionarycheck', 'qtype_pmatch'), $options, ['disabled' => 'disabled']);
+        } else {
+            $mform->addElement('select', 'applydictionarycheck',
+                    get_string('applydictionarycheck', 'qtype_pmatch'), $options);
+            $mform->setDefault('applydictionarycheck', get_string('iso6391', 'langconfig'));
+        }
         $mform->addElement('textarea', 'extenddictionary',
                         get_string('extenddictionary', 'qtype_pmatch'),
                         array('rows' => '5', 'cols' => '80'));
-        $mform->disabledIf('extenddictionary', 'applydictionarycheck', 'eq', 0);
+        $mform->disabledIf('extenddictionary', 'applydictionarycheck', 'eq', qtype_pmatch_spell_checker::DO_NOT_CHECK_OPTION);
+        $mform->addElement('text', 'sentencedividers',
+                get_string('sentencedividers', 'qtype_pmatch'), array('size' => 50));
+        $mform->addHelpButton('sentencedividers', 'sentencedividers', 'qtype_pmatch');
+        $mform->setDefault('sentencedividers', '.?!');
+        $mform->setType('sentencedividers', PARAM_RAW_TRIMMED);
         $mform->addElement('text', 'converttospace',
-                        get_string('converttospace', 'qtype_pmatch'),
-                        array('size' => 60));
+                get_string('converttospace', 'qtype_pmatch'), array('size' => 50));
+        $mform->addHelpButton('converttospace', 'converttospace', 'qtype_pmatch');
         $mform->setDefault('converttospace', ',;:');
         $mform->setType('converttospace', PARAM_RAW_TRIMMED);
 
+        $mform->addElement('text', 'modelanswer',
+                get_string('modelanswer', 'qtype_pmatch'), array('size' => 50));
+        $mform->addHelpButton('modelanswer', 'modelanswer', 'qtype_pmatch');
+        $mform->setType('modelanswer', PARAM_RAW_TRIMMED);
     }
 
     /**
      * Get the list of form elements to repeat, one for each answer.
      * @param object $mform the form being built.
-     * @param $label the label to use for each option.
-     * @param $gradeoptions the possible grades for each answer.
-     * @param $repeatedoptions reference to array of repeated options to fill
-     * @param $answersoption reference to return the name of $question->options
+     * @param string $label the label to use for each option.
+     * @param array $gradeoptions the possible grades for each answer.
+     * @param array $repeatedoptions reference to array of repeated options to fill
+     * @param string $answersoption reference to return the name of $question->options
      *                       field holding an array of answers
      * @return array of form fields.
      */
@@ -263,11 +283,12 @@ class qtype_pmatch_edit_form extends question_edit_form {
         // It would be nice to add a class to this element for styling, but it does not work.
         $repeated[] = $mform->createElement('static', 'topborder', '', ' ');
         $repeated[] = $mform->createElement('textarea', 'answer', $label,
-                            array('rows' => '8', 'cols' => '60', 'class' => 'textareamonospace'));
+                ['rows' => '8', 'cols' => '60', 'class' => 'answer-rule textareamonospace']);
         if ($this->question->qtype == 'pmatch') {
             $title = $this->get_rc_title();
             $content = $this->get_rc_content();
             $repeated[] = $mform->createElement('static', 'rule-creator-wrapper', $title, $content);
+            $repeated[] = $mform->createElement('static', 'accuracyborder', '', ' ');
             if ($html = $this->get_try_button()) {
                 $repeated[] = $mform->createElement('html', $html);
             }
@@ -288,9 +309,10 @@ class qtype_pmatch_edit_form extends question_edit_form {
         if (!\qtype_pmatch\testquestion_responses::has_responses($this->question)) {
             return $html;
         }
-        $button = '<input type="button" name="tryrule" value="Try rule">';
+        $button = '<input type="button" name="tryrule" value="' .
+                get_string('tryrule', 'qtype_pmatch') . '" class="btn btn-secondary">';
         $result = html_writer::div('', 'try-rule-result');
-        $html .= html_writer::div($button . $result, 'fitem try-rule');
+        $html .= html_writer::div(html_writer::div($button . $result, 'col-md-12'), 'fitem try-rule form-group row');
         return $html;
     }
 
@@ -311,48 +333,59 @@ class qtype_pmatch_edit_form extends question_edit_form {
      */
     protected function get_rc_content() {
         $html = html_writer::start_div('rule-creator rc-hidden');
+        $add = get_string('add', 'qtype_pmatch');
+        $addtoanswer = get_string('addtoanswer', 'qtype_pmatch');
+        $choosetoken = get_string('choosetoken', 'qtype_pmatch');
+        $exclude = get_string('exclude', 'qtype_pmatch');
+        $or = get_string('or', 'qtype_pmatch');
+        $precedes = get_string('precedes', 'qtype_pmatch');
+        $precedesclosely = get_string('precedesclosely', 'qtype_pmatch');
+        $resetrule = get_string('resetrule', 'qtype_pmatch');
+        $rule = get_string('rule', 'qtype_pmatch');
+        $template = get_string('template', 'qtype_pmatch');
+        $term = get_string('term', 'qtype_pmatch');
         $html .= <<<EOT
 <div>
     <div class="rc-notice"></div>
 </div>
 <div>
-    <label for="term">Term</label>
+    <label for="term">$term</label>
     <input type="text" name="term" value="">
-    <input type="submit" name="termadd" value="Add">
-    <input type="submit" name="termexclude" value="Exclude">
-    <input type="submit" name="termor" value="Or">
+    <input type="submit" name="termadd" class="btn btn-secondary m-b-0" value="$add">
+    <input type="submit" name="termexclude" class="btn btn-secondary m-b-0" value="$exclude">
+    <input type="submit" name="termor" class="btn btn-secondary m-b-0" value="$or">
 </div>
 <div>
-    <label for="template">Template</label>
-    <input type="text" name="template" value="">
-    <input type="submit" name="templateadd" value="Add">
-    <input type="submit" name="templateexclude" value="Exclude">
+    <label for="template">$template</label>
+    <input type="text" name="template" class="form-control" value="">
+    <input type="submit" name="templateadd" class="btn btn-secondary m-b-0" value="$add">
+    <input type="submit" name="templateexclude" class="btn btn-secondary m-b-0" value="$exclude">
 </div>
 <div>
-    <label for="precedesadd">Precedes</label>
-    <select name="precedes1">
-        <option value="0">Choose token</option>
+    <label for="precedesadd">$precedes</label>
+    <select name="precedes1" class="custom-select m-l-0">
+        <option value="0">$choosetoken</option>
     </select>
-    <select name="precedes2">
-        <option value="0">Choose token</option>
+    <select name="precedes2" class="custom-select">
+        <option value="0">$choosetoken</option>
     </select>
-    <input type="submit" name="precedesadd" value="Add">
+    <input type="submit" name="precedesadd" value="$add">
 </div>
 <div>
-    <label for="cprecedesadd">Closely precedes</label>
+    <label for="cprecedesadd">$precedesclosely</label>
     <select name="cprecedes1">
-        <option value="0">Choose token</option>
+        <option value="0">$choosetoken</option>
     </select>
     <select name="cprecedes2">
-        <option value="0">Choose token</option>
+        <option value="0">$choosetoken</option>
     </select>
-    <input type="submit" name="cprecedesadd" value="Add">
+    <input type="submit" name="cprecedesadd" class="btn btn-secondary m-b-0" value="$add">
 </div>
 <div>
-    <div>Rule</div>
+    <div>$rule</div>
     <div class="rc-result"></div>
-    <input type="submit" name="add" value="Add to answer">
-    <input type="submit" name="clear" value="Reset rule">
+    <input type="submit" name="add" class="btn btn-secondary m-l-0" value="$addtoanswer">
+    <input type="submit" name="clear" class="btn btn-secondary" value="$resetrule">
 </div>
 EOT;
         $html .= html_writer::end_div();
@@ -443,7 +476,9 @@ EOT;
             $question->forcelength = $question->options->forcelength;
             $question->applydictionarycheck = $question->options->applydictionarycheck;
             $question->extenddictionary = $question->options->extenddictionary;
+            $question->sentencedividers = $question->options->sentencedividers;
             $question->converttospace = $question->options->converttospace;
+            $question->modelanswer = $question->options->modelanswer;
         }
         if (isset($question->options->synonyms)) {
             $synonyms = $question->options->synonyms;
@@ -465,12 +500,22 @@ EOT;
         $answers = $data['answer'];
         $answercount = 0;
         $maxgrade = false;
+
+        // Check whether any chars of sentencedividers field exists in converttospace field.
+        if (isset($data['sentencedividers'])) {
+            if ($charfound = \qtype_pmatch\form_utils::find_char_in_both_strings($data['sentencedividers'], $data['converttospace'])) {
+                $errors['converttospace'] = get_string('sentencedividers_noconvert', 'qtype_pmatch', $charfound);
+            }
+        }
+
+        $allanswersok = true;
         foreach ($answers as $key => $answer) {
             $trimmedanswer = trim($answer);
             if ($trimmedanswer !== '') {
                 $expression = new pmatch_expression($trimmedanswer);
                 if (!$expression->is_valid()) {
                     $errors["answer[$key]"] = $expression->get_parse_error();
+                    $allanswersok = false;
                 }
                 $answercount++;
                 if ($data['fraction'][$key] == 1) {
@@ -479,6 +524,7 @@ EOT;
             } else if ($data['fraction'][$key] != 0 ||
                                             !html_is_blank($data['feedback'][$key]['text'])) {
                 $errors["answer[$key]"] = get_string('answermustbegiven', 'qtype_pmatch');
+                $allanswersok = false;
                 $answercount++;
             }
         }
@@ -487,6 +533,13 @@ EOT;
         }
         if ($maxgrade == false) {
             $errors['fraction[0]'] = get_string('fractionsnomax', 'question');
+        }
+
+        if (isset($data['modelanswer'])) {
+            $modelanswer = trim($data['modelanswer']);
+            if ($allanswersok && !\qtype_pmatch\form_utils::validate_modelanswer($answers, $data['fraction'], $modelanswer)) {
+                $errors['modelanswer'] = get_string('modelanswererror', 'qtype_pmatch', $modelanswer);
+            }
         }
 
         $errors += \qtype_pmatch\form_utils::validate_synonyms($data);
