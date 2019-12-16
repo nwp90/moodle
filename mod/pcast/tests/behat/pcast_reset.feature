@@ -1,4 +1,4 @@
-@mod @mod_pcast @file_upload @javascript
+@mod @mod_pcast @_file_upload @javascript
 Feature: Pcast reset
   In order to reuse past podcast activities
   As a teacher
@@ -130,6 +130,7 @@ Feature: Pcast reset
     And I should see "Test episode summary"
     And I follow "View"
     And I follow "audio/mp3"
+    And I wait until the page is ready
     And I press the "back" button in the browser
     And I follow "Course 1"
     And I follow "Test podcast name"
