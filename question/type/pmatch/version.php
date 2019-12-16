@@ -24,10 +24,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2018111900;
-$plugin->requires  = 2016120500;
+$plugin->version   = 2019111100;
+$plugin->requires  = 2018051700;
 $plugin->component = 'qtype_pmatch';
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '2.4 for Moodle 3.4+';
+$plugin->release   = '2.9 for Moodle 3.5+';
 
 $plugin->outestssufficient = true;

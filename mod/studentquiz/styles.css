@@ -208,6 +208,7 @@
 }
 
 .path-mod-studentquiz .studentquiz_behaviour .rate {
+    margin-top: 20px;
     margin-bottom: 20px;
 }
 
@@ -241,9 +242,10 @@
 
 .path-mod-studentquiz .studentquiz_behaviour .rate .rating {
     cursor: not-allowed;
-    direction: rtl;
     display: inline-block;
     unicode-bidi: bidi-override;
+    height: 0;
+    vertical-align: text-top;
 }
 
 .path-mod-studentquiz .studentquiz_behaviour .rate .error {
@@ -251,8 +253,7 @@
 }
 
 .path-mod-studentquiz .studentquiz_behaviour .star,
-.path-mod-studentquiz .studentquiz_behaviour .rate .rating .rateable.star-empty:hover,
-.path-mod-studentquiz .studentquiz_behaviour .rate .rating .rateable.star-empty:hover ~ .rateable.star-empty {
+.path-mod-studentquiz .studentquiz_behaviour .rate .rating:hover .rateable.star-empty {
     background-image: url([[pix:mod_studentquiz|star_icon]]);
 }
 
@@ -267,8 +268,23 @@
     cursor: pointer;
 }
 
-.path-mod-studentquiz .studentquiz_behaviour .star-empty {
+.path-mod-studentquiz .studentquiz_behaviour .star-empty,
+.path-mod-studentquiz .studentquiz_behaviour .rate .rating .rateable:hover ~ .rateable.star-empty,
+.path-mod-studentquiz .studentquiz_behaviour .rate .rating .rateable.star-empty:hover ~ .rateable.star-empty {
     background-image: url([[pix:mod_studentquiz|star_empty_icon]]);
+}
+
+.path-mod-studentquiz .change-question-state {
+    display: block;
+}
+
+.path-mod-studentquiz .change-question-state select#menustatetype,
+.path-mod-studentquiz .change-question-state button#change_state {
+    margin-left: 10px;
+}
+
+.path-mod-studentquiz .change-question-state button#change_state {
+    margin-right: 10px;
 }
 
 .path-mod-studentquiz .pagination .form-control {
@@ -288,4 +304,9 @@
 .path-mod-studentquiz #mod_studentquiz_rankingblock .card-text.content > div {
     display: flex;
     justify-content: space-between;
+}
+
+.path-mod-studentquiz .mod_studentquiz_submission_info {
+    margin-top: 10px;
+    margin-bottom: 10px;
 }

@@ -25,10 +25,13 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 
-$id     = required_param('id', PARAM_INT);
-$mode   = optional_param('mode', ROSTER_MODE_DISPLAY, PARAM_TEXT);
-$group  = optional_param('group', 0, PARAM_INT);
-$course = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
+$id          = required_param('id', PARAM_INT);
+$mode        = optional_param('mode', ROSTER_MODE_DISPLAY, PARAM_TEXT);
+$group       = optional_param('group', 0, PARAM_INT);
+$role        = optional_param('role', 0, PARAM_INT);
+$defaultsize = get_config('report_roster', 'size_' . get_config('report_roster', 'size_default'));
+$size        = optional_param('size', $defaultsize, PARAM_INT);
+$course      = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
 require_login($course);
 
@@ -46,7 +49,11 @@ $coursecontext = context_course::instance($course->id);
 require_capability('report/roster:view', $coursecontext);
 
 // Get all the users.
-$userlist = get_enrolled_users($coursecontext, '', $group, user_picture::fields('u', ['username'], 0, 0, true));
+if ($role > 0) {
+    $userlist = get_role_users($role, $coursecontext, false, user_picture::fields('u', ['username'], 0, 0, true), null, null, $group);
+} else {
+    $userlist = get_enrolled_users($coursecontext, '', $group, user_picture::fields('u', ['username'], 0, 0, true));
+}
 
 // Get suspended users.
 $suspended = get_suspended_userids($coursecontext);
@@ -54,7 +61,7 @@ $suspended = get_suspended_userids($coursecontext);
 $data = array();
 foreach ($userlist as $user) {
     if (!in_array($user->id, $suspended)) {
-        $item = $OUTPUT->user_picture($user, array('size' => 100, 'courseid' => $course->id));
+        $item = $OUTPUT->user_picture($user, array('size' => $size, 'courseid' => $course->id));
         $item .= html_writer::tag('span', fullname($user));
         $item .= get_config('report_roster', 'show_username') ? html_writer::tag('span', $user->username) : '';
         $data[] = $item;
@@ -69,6 +76,14 @@ $PAGE->requires->js_call_amd('report_roster/roster', 'init');
 // Display the roster to the user.
 echo $OUTPUT->header();
 echo html_writer::tag('button', get_string('learningmodeoff', 'report_roster'), array('id' => 'report-roster-toggle'));
-echo report_roster_output_action_buttons($id, $group, $mode, $PAGE->url);
+
+$currentparams = array(
+    'group' => $group,
+    'role'  => $role,
+    'size'  => $size,
+    'mode'  => $mode
+);
+echo report_roster_output_action_buttons($id, $PAGE->url, $currentparams);
+
 echo html_writer::alist($data, array('class' => 'report-roster'));
 echo $OUTPUT->footer();

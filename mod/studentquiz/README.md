@@ -38,14 +38,14 @@ For changes and instructions please read the [Release Notes](https://github.com/
 
 ## Documentation
 
-You can find manuals for each role in the [manuals website](https://docs.moodle.org/34/en/StudentQuiz_module). 
+You can find manuals for each role in the [manuals website](https://docs.moodle.org/37/en/StudentQuiz_module). 
 
 ## Compatibility
 
 Supported and tested with:
 
-* Moodle 3.4, 3.5
-* PHP 7.0, 7.1, 7.2
+* Moodle 3.5, 3.6, 3.7
+* PHP 7.1, 7.2, 7.3
 * Databases: MySQL, MariaDB, PostgreSQL
 * Browsers: Firefox, Chrome
 

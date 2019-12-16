@@ -25,22 +25,20 @@
 defined('MOODLE_INTERNAL') || die;
 
 $string['allusers'] = 'All users';
-$string['displaymode'] = 'Display mode';
 $string['learningmodeoff'] = 'Learning mode off';
 $string['learningmodeon'] = 'Learning mode on';
+$string['param:mode'] = 'Display mode';
 $string['pluginname'] = 'Roster';
 $string['printmode'] = 'Printable';
 $string['privacy:metadata'] = 'The roster report only shows data stored in other locations.';
 $string['roster:view'] = 'View roster course report';
 $string['settings:displayname'] = 'Display name';
-$string['settings:displayname:description'] = 'This will display on the report page and in the navigation link.';
+$string['settings:displayname:description'] = 'This will display on the report page and in the flat navigation link (if enabled below).';
 $string['settings:displayname:default'] = 'Roster';
-$string['settings:show_username'] = 'Show username';
-$string['settings:show_username:description'] = 'Show username below fullname in the Roster Report';
 $string['settings:flatnav'] = 'Display in flat navigation?';
 $string['settings:flatnav:description'] = 'If checked, a link to the Roster report will be added to the Boost flat navigation.
-(Under older themes like More, it will appear in the Navigation block under Current course > {coursename})';
-$string['settings:flatnav_position'] = 'Position in Flat Navigation';
+(Under older themes like More, it will appear in the Navigation block under Current course > {coursename}.)';
+$string['settings:flatnav_position'] = 'Position in flat navigation';
 $string['settings:flatnav_position:description'] = 'A link to the report will be added *above* the link at the top of this list.
 If not found, it will try the next in the list, and so on. The first word on each line is the link identifier; everything afterward
 is ignored (so that the identifiers can be labelled). The main course navigation nodes are included by default; the identifiers for
@@ -51,5 +49,21 @@ competencies (Competencies)
 grades (Grades)
 participants (Participants)
 ";
+$string['settings:headings:flatnav'] = 'Flat Navigation Settings';
+$string['settings:headings:general'] = 'General Settings';
+$string['settings:headings:size'] = 'User Image Size Settings';
+$string['settings:show_username'] = 'Show username';
+$string['settings:show_username:description'] = 'Show username below fullname in the Roster Report.';
+$string['settings:size_default'] = 'Default size';
+$string['settings:size_default:description'] = 'Default user image size (when a user first opens the report).';
+$string['settings:size_large'] = 'Size: Large';
+$string['settings:size_large:description'] = 'User image size in pixels for "Large"';
+$string['settings:size_medium'] = 'Size: Medium';
+$string['settings:size_medium:description'] = 'User image size in pixels for "Medium"';
+$string['settings:size_small'] = 'Size: Small';
+$string['settings:size_small:description'] = 'User image size in pixels for "Small"';
+$string['size:small'] = 'Small';
+$string['size:medium'] = 'Medium';
+$string['size:large'] = 'Large';
 $string['webmode'] = 'Web report';
 

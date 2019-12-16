@@ -38,70 +38,89 @@ require_once($CFG->dirroot . '/question/engine/tests/helpers.php');
  * @group qtype_varnumericset
  */
 class qtype_varnumericset_question_test extends advanced_testcase {
-    public function test_num_within_allowed_error() {
-        $this->assertTrue(
-                qtype_varnumericset_question::num_within_allowed_error('1.230001e4', 1.23e4, ''));
-        $this->assertFalse(
-                qtype_varnumericset_question::num_within_allowed_error('1.230002e4', 1.23e4, ''));
-        $this->assertTrue(
-                qtype_varnumericset_question::num_within_allowed_error('-1.230001e4', -1.23e4, ''));
-        $this->assertFalse(
-                qtype_varnumericset_question::num_within_allowed_error('-1.230002e4', -1.23e4, ''));
-        $this->assertTrue(
-                qtype_varnumericset_question::num_within_allowed_error('-9.000009e-4', -9e-4, ''));
-        $this->assertFalse(
-                qtype_varnumericset_question::num_within_allowed_error('-9.000010e-4', -9e-4, ''));
-        $this->assertTrue(
-                qtype_varnumericset_question::num_within_allowed_error('1.2301e4', 1.23e4, '1'));
-        $this->assertFalse(
-                qtype_varnumericset_question::num_within_allowed_error('1.23015e4', 1.23e4, '1'));
-        $this->assertTrue(
-                qtype_varnumericset_question::num_within_allowed_error('12299', 1.23e4, '1'));
-        $this->assertFalse(
-                qtype_varnumericset_question::num_within_allowed_error('1.2985e4', 1.23e4, '1'));
-        $this->assertTrue(
-                qtype_varnumericset_question::num_within_allowed_error('1.2299', 1.23, '0.001'));
-        $this->assertFalse(
-                qtype_varnumericset_question::num_within_allowed_error('1.2985', 1.23, '0.001'));
-        $this->assertTrue(
-                qtype_varnumericset_question::num_within_allowed_error('-12299', -1.23e4, '1'));
-        $this->assertFalse(
-                qtype_varnumericset_question::num_within_allowed_error('-1.2985e4', -1.23e4, '1'));
-        $this->assertTrue(
-                qtype_varnumericset_question::num_within_allowed_error('-1.2299', -1.23, '0.001'));
-        $this->assertFalse(
-                qtype_varnumericset_question::num_within_allowed_error('-1.2985', -1.23, '0.001'));
-        $this->assertTrue(
-                qtype_varnumericset_question::num_within_allowed_error('12301', 1.23e4, '1'));
-        $this->assertFalse(
-                qtype_varnumericset_question::num_within_allowed_error('12301.5', 1.23e4, '1'));
-        $this->assertTrue(
-                qtype_varnumericset_question::num_within_allowed_error('-4', -4, ''));
-        $this->assertFalse(
-                qtype_varnumericset_question::num_within_allowed_error('4', -4, ''));
-        $this->assertTrue(
-                qtype_varnumericset_question::num_within_allowed_error('-4', -4, '0.0001'));
-        $this->assertFalse(
-                qtype_varnumericset_question::num_within_allowed_error('4', -4, '0.0001'));
-        $this->assertTrue(
-                qtype_varnumeric_question_base::num_within_allowed_error(-4.20, -4.2, 0));
-        $this->assertTrue(
-                qtype_varnumeric_question_base::num_within_allowed_error(12, 12, 0));
+
+    /**
+     * Test-cases for test_num_within_allowed_error
+     *
+     * @return array of arrays of arguments for test_num_within_allowed_error
+     */
+    public function num_within_allowed_error_cases() {
+        return [
+            ['1.23000000000001e4', 1.23e4, '', true],
+            ['1.23000000000002e4', 1.23e4, '', false],
+            ['-1.23000000000001e4', -1.23e4, '', true],
+            ['-1.23000000000002e4', -1.23e4, '', false],
+            ['-9.00000000000009e-4', -9e-4, '', true],
+            ['-9.00000000000010e-4', -9e-4, '', false],
+            ['1.2301e4', 1.23e4, '1', true],
+            ['1.23015e4', 1.23e4, '1', false],
+            ['12299', 1.23e4, '1', true],
+            ['1.2985e4', 1.23e4, '1', false],
+            ['1.2299', 1.23, '0.001', true],
+            ['1.2985', 1.23, '0.001', false],
+            ['-12299', -1.23e4, '1', true],
+            ['-1.2985e4', -1.23e4, '1', false],
+            ['-1.2299', -1.23, '0.001', true],
+            ['-1.2985', -1.23, '0.001', false],
+            ['12301', 1.23e4, '1', true],
+            ['12301.5', 1.23e4, '1', false],
+            ['-4', -4, '', true],
+            ['4', -4, '', false],
+            ['-4', -4, '0.0001', true],
+            ['4', -4, '0.0001', false],
+            [-4.20, -4.2, 0, true],
+            [12, 12, 0, true],
+            ['9437183', 9437184, '', false],
+            ['9437184', 9437184, '', true],
+            ['9437185', 9437184, '', false],
+            ['75497471', 75497472, '', false],
+            ['75497472', 75497472, '', true],
+            ['75497473', 75497472, '', false],
+        ];
     }
 
-    public function test_wrong_by_a_factor_of_ten() {
-        $this->assertTrue(
-            qtype_varnumericset_question::wrong_by_a_factor_of_ten('1.23e4', 1.23e5, '', 1));
-        $this->assertFalse(
-            qtype_varnumericset_question::wrong_by_a_factor_of_ten('1.23e4', 1.23e6, '', 1));
-        $this->assertTrue(
-            qtype_varnumericset_question::wrong_by_a_factor_of_ten('1.231', 12.3, 0.01, 1));
-        $this->assertFalse(
-            qtype_varnumericset_question::wrong_by_a_factor_of_ten('1.232', 12.3, 0.01, 1));
-        $this->assertTrue(
-            qtype_varnumericset_question::wrong_by_a_factor_of_ten('151000', 150, 1, 3));
-        $this->assertFalse(
-            qtype_varnumericset_question::wrong_by_a_factor_of_ten('152000', 150, 1, 3));
+    /**
+     * @dataProvider num_within_allowed_error_cases
+     */
+    public function test_num_within_allowed_error($response, $answer, $allowederror, $shouldmatch) {
+        if ($shouldmatch) {
+            $this->assertTrue(
+                    qtype_varnumeric_question_base::num_within_allowed_error($response, $answer, $allowederror));
+        } else {
+            $this->assertFalse(
+                    qtype_varnumeric_question_base::num_within_allowed_error($response, $answer, $allowederror));
+        }
+    }
+
+    /**
+     * Test-cases for test_num_within_allowed_error
+     *
+     * @return array of arrays of arguments for test_num_within_allowed_error
+     */
+    public function wrong_by_a_factor_of_ten_cases() {
+        return [
+            ['1.23e4', 1.23e5, '', 1, true],
+            ['1.23e4', 1.23e6, '', 1, false],
+            ['1.231', 12.3, 0.01, 1, true],
+            ['1.232', 12.3, 0.01, 1, false],
+            ['151000', 150, 1, 3, true],
+            ['152000', 150, 1, 3, false],
+        ];
+    }
+
+    /**
+     * @dataProvider wrong_by_a_factor_of_ten_cases
+     */
+    public function test_wrong_by_a_factor_of_ten($response, $roundedanswer, $allowederror, $maxfactor, $shouldmatch) {
+        if ($shouldmatch) {
+            $this->assertTrue(
+                    qtype_varnumeric_question_base::wrong_by_a_factor_of_ten(
+                            $response, $roundedanswer, $allowederror, $maxfactor));
+        } else {
+            $this->assertFalse(
+                    qtype_varnumeric_question_base::wrong_by_a_factor_of_ten(
+                            $response, $roundedanswer, $allowederror, $maxfactor));
+        }
     }
 
     public function test_has_number_of_sig_figs() {
@@ -203,34 +222,48 @@ class qtype_varnumericset_question_test extends advanced_testcase {
 
     }
 
-    public function test_round_to() {
-        $this->assertSame('0.123', qtype_varnumericset_question::round_to(0.12345, 3, false));
-        $this->assertSame('0.1235', qtype_varnumericset_question::round_to(0.12345, 4, false));
-        // Incorrect rounding.
-        $this->assertSame('1.235e-1',
-                                        qtype_varnumericset_question::round_to(0.12345, 4, true));
-        // Incorrect rounding.
-        $this->assertSame('1.234e-1',
-                                    qtype_varnumericset_question::round_to(0.12345, 4, true, true));
-        $this->assertSame('1234.57',
-                                    qtype_varnumericset_question::round_to(1234.5678, 6, false));
-        $this->assertSame('1.23457e3',
-                                    qtype_varnumericset_question::round_to(1234.5678, 6, true));
-        // Incorrect rounding.
-        $this->assertSame('1234.56',
-                                qtype_varnumericset_question::round_to(1234.5678, 6, false, true));
-        $this->assertSame('1.23456e3',
-                                qtype_varnumericset_question::round_to(1234.5678, 6, true, true));
-        // Always round down when incorrect rounding requested.
-        $this->assertSame('1234.56',
-                                qtype_varnumericset_question::round_to(1234.5600, 6, false, true));
-        $this->assertSame('1.23456e3',
-                                qtype_varnumericset_question::round_to(1234.5600, 6, true, true));
+    /**
+     * Test-cases for test_num_within_allowed_error
+     *
+     * @return array of arrays of arguments for test_num_within_allowed_error
+     */
+    public function round_to_cases() {
+        return [
+            ['0.123', 0.12345, 3, false, false],
+            ['0.1235', 0.12345, 4, false, false],
+            // Incorrect rounding.
+            ['1.235e-1', 0.12345, 4, true, false],
+            // Incorrect rounding.
+            ['1.234e-1', 0.12345, 4, true, true],
+            ['1234.57', 1234.5678, 6, false, false],
+            ['1.23457e3', 1234.5678, 6, true, false],
+            // Incorrect rounding.
+            ['1234.56', 1234.5678, 6, false, true],
+            ['1.23456e3', 1234.5678, 6, true, true],
+            // Always round down when incorrect rounding requested.
+            ['1234.56', 1234.5600, 6, false, true],
+            ['1.23456e3', 1234.5600, 6, true, true],
+            // Test default precision
+            ['1234.56', 1234.5600, 0, false, false],
+            ['1.234560e3', 1234.5600, 0, true, false],
+            ['75497472', 75497472, 0, false, false],
+        ];
     }
 
     /**
+     * @dataProvider round_to_cases
+     */
+    public function test_round_to($expected, $number, $sigfigs, $scinotation, $floor) {
+        $this->assertSame($expected,
+                qtype_varnumeric_question_base::round_to($number, $sigfigs, $scinotation, $floor));
+    }
+
+    /**
+     * Grade one response ot one question, and return the fraction.
+     *
      * @param qtype_varnumericset_question $question
-     * @param array $enteredresponse
+     * @param string $enteredresponse
+     * @return float the fraction (mark out of 1).
      */
     protected function grade($question, $enteredresponse) {
         list($fraction, $stateforfraction) = $question->grade_response(array('answer' => $enteredresponse));
@@ -322,6 +355,26 @@ class qtype_varnumericset_question_test extends advanced_testcase {
         list($penalty, $autofeedback, $warning) = $q->compare_num_as_string_with_answer(
                 '12.', $answer);
         $this->assertEquals(1, $penalty);
+    }
+
+    public function test_compare_num_as_string_with_answer_no_rounding() {
+        $q = test_question_maker::make_question('varnumericset'); // Does not matter which one.
+
+        $answer = new qtype_varnumericset_answer(12345, // Id.
+                '123456789', // Answer.
+                '1',         // Fraction.
+                '<p>Your answer is correct.</p>', // Feedback.
+                FORMAT_HTML, // Feedbackformat.
+                '',          // Sigfigs.
+                '',          // Error.
+                '0.1',       // Syserrorpenalty.
+                '0',         // Checknumerical.
+                '0',         // Checkscinotation.
+                '0',         // Checkpowerof10.
+                '0');        // Checkrounding.
+
+        list($penalty, $autofeedback, $warning) = $q->compare_num_as_string_with_answer('123456789', $answer);
+        $this->assertEquals(0, $penalty);
     }
 
     public function test_grade_response() {

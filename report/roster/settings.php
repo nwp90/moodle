@@ -25,12 +25,9 @@
 defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
+
     $settings->add(
-        new admin_setting_configcheckbox('report_roster/flatnav',
-            get_string('settings:flatnav', 'report_roster'),
-            get_string('settings:flatnav:description', 'report_roster'),
-            0
-        )
+        new admin_setting_heading('general', get_string('settings:headings:general', 'report_roster'), '')
     );
 
     $settings->add(
@@ -50,10 +47,68 @@ if ($ADMIN->fulltree) {
     );
 
     $settings->add(
+        new admin_setting_heading('flatnav', get_string('settings:headings:flatnav', 'report_roster'), '')
+    );
+
+    $settings->add(
+        new admin_setting_configcheckbox('report_roster/flatnav',
+            get_string('settings:flatnav', 'report_roster'),
+            get_string('settings:flatnav:description', 'report_roster'),
+            0
+        )
+    );
+
+    $settings->add(
         new admin_setting_configtextarea('report_roster/flatnav_position',
             get_string('settings:flatnav_position', 'report_roster'),
             get_string('settings:flatnav_position:description', 'report_roster'),
             get_string('settings:flatnav_position:default', 'report_roster')
+        )
+    );
+
+    $options = array(
+        'small'  => get_string('size:small', 'report_roster'),
+        'medium' => get_string('size:medium', 'report_roster'),
+        'large'  => get_string('size:large', 'report_roster'),
+    );
+
+    $settings->add(
+        new admin_setting_heading('size', get_string('settings:headings:size', 'report_roster'), '')
+    );
+
+    $settings->add(
+        new admin_setting_configselect('report_roster/size_default',
+            get_string('settings:size_default', 'report_roster'),
+            get_string('settings:size_default:description', 'report_roster'),
+            'small',
+            $options
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configtext('report_roster/size_small',
+            get_string('settings:size_small', 'report_roster'),
+            get_string('settings:size_small:description', 'report_roster'),
+            100,
+            PARAM_INT
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configtext('report_roster/size_medium',
+            get_string('settings:size_medium', 'report_roster'),
+            get_string('settings:size_medium:description', 'report_roster'),
+            200,
+            PARAM_INT
+        )
+    );
+
+    $settings->add(
+        new admin_setting_configtext('report_roster/size_large',
+            get_string('settings:size_large', 'report_roster'),
+            get_string('settings:size_large:description', 'report_roster'),
+            300,
+            PARAM_INT
         )
     );
 }
