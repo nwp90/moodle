@@ -15,23 +15,30 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Variable numeric uestion type version information.
+ * Mobile plugin.
  *
- * @package   qtype_varnumeric
- * @copyright 2011 The Open University
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package qtype_varnumeric
+ * @copyright 2019 The Open University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2019110900;
-$plugin->requires  = 2018051700;
-$plugin->component = 'qtype_varnumeric';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.9 for Moodle 3.5+';
-
-$plugin->dependencies = array(
-    'qtype_varnumericset' => 2019110900,
-);
-
-$plugin->outestssufficient = true;
+$addons = [
+    'qtype_varnumeric' => [
+        'handlers' => [
+            'varnumeric' => [
+                'delegate' => 'CoreQuestionDelegate',
+                'method' => 'varnum_view',
+                'styles' => [
+                    'url' => $CFG->wwwroot . '/question/type/varnumericset/mobileapp.css',
+                    'version' => 2019040200
+                ],
+                'init' => 'varnum_view'
+            ],
+        ],
+        'lang' => [ // Language strings to be used.
+            ['err_ousupsubnotsupportedonmobile', 'qtype_varnumericset']
+        ]
+    ]
+];
