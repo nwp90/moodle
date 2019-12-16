@@ -15,24 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * OU multiple response question type version file.
+ * Mobile plugin.
  *
- * @package   qtype_oumultiresponse
- * @copyright 2008 The Open University
- * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package qtype_oumultiresponse
+ * @copyright 2018 The Open University
+ * @license http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-
-$plugin->version   = 2019110900;
-$plugin->requires  = 2018051700;
-$plugin->component = 'qtype_oumultiresponse';
-$plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '2.1 for Moodle 3.5+';
-
-$plugin->dependencies = array(
-    'qtype_multichoice' => 2017111300,
-);
-
-$plugin->outestssufficient = true;
+$addons = [
+    'qtype_oumultiresponse' => [
+        'handlers' => [
+            'oumultiresponse' => [
+                'delegate' => 'CoreQuestionDelegate',
+                'method' => 'oumr_view'
+            ]
+        ]
+    ]
+];
