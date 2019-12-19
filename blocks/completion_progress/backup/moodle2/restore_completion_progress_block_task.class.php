@@ -14,22 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
- * @package    contrib
- * @subpackage block_progress
- * @copyright  2012 Enovation Solutions, Tomasz Muras
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
- */
+defined('MOODLE_INTERNAL') || die;
 
 /**
- * Backup task for the Progress Bar block
+ * Backup task for the Completion Progress block
  *
- * @package    contrib
- * @subpackage block_progress
- * @copyright  2012 Enovation Solutions, Tomasz Muras
+ * @package    block_completion_progress
+ * @copyright  2016 Michael de Raadt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class restore_progress_block_task extends restore_block_task {
+class restore_completion_progress_block_task extends restore_block_task {
 
     /**
      * Translates the backed up configuration data for the target course modules.
@@ -38,7 +32,6 @@ class restore_progress_block_task extends restore_block_task {
      */
     public function after_restore() {
         global $DB;
-        $prefixes = array('monitor_', 'date_time_', 'action_', 'locked_');
 
         // Get the blockid.
         $id = $this->get_blockid();
@@ -48,41 +41,29 @@ class restore_progress_block_task extends restore_block_task {
 
         if ($configdata = $DB->get_field('block_instances', 'configdata', array('id' => $id))) {
             $config = (array)unserialize(base64_decode($configdata));
-            $newconfig = $config;
+            $newactivities = array();
+            if (isset($config['selectactivities'])) {
 
-            // Filter module related config information.
-            foreach ($newconfig as $key => $value) {
-                foreach ($prefixes as $prefix) {
-                    if (substr($key, 0, strlen($prefix)) === $prefix) {
-                        unset($newconfig[$key]);
-                    }
-                }
-            }
+                // Translate the old config information to the target course values.
+                foreach ($config['selectactivities'] as $index => $value) {
+                    $matches = array();
+                    preg_match('/(.+)-(\d+)/', $value, $matches);
+                    if (!empty($matches)) {
+                        $module = $matches[1];
+                        $instance = $matches[2];
 
-            // Translate the old config information to the target course values.
-            foreach ($config as $key => $value) {
-                $matches = array();
-                preg_match('/monitor_(\D+)(\d+)/', $key, $matches);
-                if (!empty($matches)) {
-                    $module = $matches[1];
-                    $instance = $matches[2];
-
-                    // Find the mapped instance ID.
-                    if ($newinstance = restore_dbops::get_backup_ids_record($this->get_restoreid(), $module, $instance)) {
-                        $newinstanceid = $newinstance->newitemid;
-
-                        // Translate new instance values from old IDs.
-                        foreach ($prefixes as $prefix) {
-                            if (array_key_exists("$prefix$module$instance", $config)) {
-                                $newconfig["$prefix$module$newinstanceid"] = $config["$prefix$module$instance"];
-                            }
+                        // Find the mapped instance ID.
+                        if ($newinstance = restore_dbops::get_backup_ids_record($this->get_restoreid(), $module, $instance)) {
+                            $newinstanceid = $newinstance->newitemid;
+                            $newactivities[] = "$module-$newinstanceid";
                         }
                     }
                 }
             }
 
             // Save everything back to DB.
-            $configdata = base64_encode(serialize((object)$newconfig));
+            $config['selectactivities'] = $newactivities;
+            $configdata = base64_encode(serialize((object)$config));
             $DB->set_field('block_instances', 'configdata', $configdata, array('id' => $id));
         }
     }
@@ -134,5 +115,4 @@ class restore_progress_block_task extends restore_block_task {
     static public function define_decode_rules() {
         return array();
     }
-
 }

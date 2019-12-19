@@ -16,16 +16,17 @@
 
 
 /**
- * Progress Bar block version details
+ * Completion Progress block version details
  *
- * @package    contrib
- * @subpackage block_progress
- * @copyright  2010 Michael de Raadt
+ * @package    block_completion_progress
+ * @copyright  2018 Michael de Raadt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-$plugin->version   = 2016081800;
-$plugin->requires  = 2010121000;
+defined('MOODLE_INTERNAL') || die;
+
+$plugin->version   = 2019072700;
+$plugin->requires  = 2014111100; // Moodle 2.8.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = 'Version for Moodle 2.0 to 3.1 (final)';
-$plugin->component = 'block_progress';
+$plugin->release   = 'Version for Moodle 2.8 onwards';
+$plugin->component = 'block_completion_progress';

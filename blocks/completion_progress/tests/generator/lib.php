@@ -15,37 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package    contrib
- * @subpackage block_progress
- * @copyright  2012 Michael de Raadt
+ * block_completion_progress data generator
+ *
+ * @package    block_completion_progress
+ * @category   test
+ * @copyright  2018 Michael Aherne
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
+
 
 /**
- * Backup task for the Progress Bar block
+ * Completion progress block data generator class
  *
- * @package    contrib
- * @subpackage block_progress
- * @copyright  2012 Michael de Raadt
+ * @package    block_completion_progress
+ * @category   test
+ * @copyright  2018 Michael Aherne
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class backup_progress_block_task extends backup_block_task {
+class block_completion_progress_generator extends testing_block_generator {
 
-    protected function define_my_settings() {
-    }
-
-    protected function define_my_steps() {
-    }
-
-    public function get_fileareas() {
-        return array();
-    }
-
-    public function get_configdata_encoded_attributes() {
-        return array();
-    }
-
-    static public function encode_content_links($content) {
-        return $content;
-    }
 }
