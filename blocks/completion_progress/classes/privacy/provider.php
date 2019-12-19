@@ -15,26 +15,32 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Progress Bar cache setup
+ * Privacy Subsystem implementation for block_calendar_month.
  *
- * @package    contrib
- * @subpackage block_progress
- * @copyright  2010 Michael de Raadt
+ * @package    block_completion_progress
+ * @copyright  2018 Michael de Raadt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') or die("Direct access to this location is not allowed.");
+namespace block_completion_progress\privacy;
 
-$definitions = array(
+defined('MOODLE_INTERNAL') || die();
 
-    // Used to store results of queries about views from the logs.
-    'cachedlogs' => array(
-        'mode' => cache_store::MODE_APPLICATION,
-        'simplekeys' => true,
-        'simpledata' => true,
-        'staticacceleration' => true,
-        'invalidationevents' => array(
-            'changesincourse',
-        )
-    ),
-);
+/**
+ * Privacy Subsystem for block_calendar_month implementing null_provider.
+ *
+ * @copyright  2018 Michael de Raadt
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
+
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function get_reason() : string {
+        return 'privacy:metadata';
+    }
+}

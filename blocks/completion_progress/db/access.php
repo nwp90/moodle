@@ -15,42 +15,39 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Progress Bar capability setup
+ * Completion Progress block capability setup
  *
- * @package    contrib
- * @subpackage block_progress
- * @copyright  2010 Michael de Raadt
+ * @package    block_completion_progress
+ * @copyright  2016 Michael de Raadt
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') or die("Direct access to this location is not allowed.");
+defined('MOODLE_INTERNAL') or die();
 
 $capabilities = array (
-    'block/progress:overview' => array (
+    'block/completion_progress:overview' => array (
         'riskbitmask'   => RISK_PERSONAL,
         'captype'       => 'read',
         'contextlevel'  => CONTEXT_BLOCK,
         'archetypes'    => array (
-            'teacher'        => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'manager'        => CAP_ALLOW,
-            'coursecreator'  => CAP_ALLOW,
+            'teacher'           => CAP_ALLOW,
+            'editingteacher'    => CAP_ALLOW,
+            'manager'           => CAP_ALLOW,
+            'coursecreator'     => CAP_ALLOW
         )
     ),
 
-    'block/progress:showbar' => array (
+    'block/completion_progress:showbar' => array (
         'captype'       => 'read',
         'contextlevel'  => CONTEXT_BLOCK,
         'archetypes'    => array (
-            'teacher'        => CAP_ALLOW,
-            'editingteacher' => CAP_ALLOW,
-            'student'        => CAP_ALLOW,
-            'manager'        => CAP_ALLOW,
-            'coursecreator'  => CAP_ALLOW,
+            'teacher'           => CAP_ALLOW,
+            'editingteacher'    => CAP_ALLOW,
+            'student'           => CAP_ALLOW,
         )
     ),
 
-    'block/progress:addinstance' => array(
+    'block/completion_progress:addinstance' => array(
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'write',
         'contextlevel' => CONTEXT_BLOCK,
@@ -63,12 +60,12 @@ $capabilities = array (
         'clonepermissionsfrom' => 'moodle/site:manageblocks'
     ),
 
-    'block/progress:myaddinstance' => array(
+    'block/completion_progress:myaddinstance' => array(
         'riskbitmask' => RISK_PERSONAL,
         'captype' => 'read',
         'contextlevel' => CONTEXT_SYSTEM,
         'archetypes' => array(
-            'user' => CAP_ALLOW,
+            'user' => CAP_ALLOW
         ),
 
         'clonepermissionsfrom' => 'moodle/my:manageblocks'

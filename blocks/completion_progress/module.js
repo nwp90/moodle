@@ -1,4 +1,4 @@
-M.block_progress = {
+M.block_completion_progress = {
     progressBarLast: new Array(),
     locked: false,
 
@@ -10,7 +10,7 @@ M.block_progress = {
                 this.progressBarLast[instances[instance] + '-' + users[user]] = 'info';
             }
         }
-        this.addEvent(window, 'resize', function(e) {M.block_progress.setupScrolling(YUIObject);});
+        this.addEvent(window, 'resize', function(e) {M.block_completion_progress.setupScrolling(YUIObject);});
     },
 
     showInfo: function (instance, user, id) {
@@ -52,8 +52,8 @@ M.block_progress = {
             rightArrows = barContainers[i].getElementsByClassName('right-arrow-svg');
             if(leftArrows.length > 0) {
                 this.checkArrows(barContainers[i]);
-                this.addEvent(leftArrows[0].firstChild, 'click', function(e) {M.block_progress.scrollContainer(e.target.parentNode, -1); e.target.stopPagination();})
-                this.addEvent(rightArrows[0].firstChild, 'click', function(e) {M.block_progress.scrollContainer(e.target.parentNode, 1); e.target.stopPagination();})
+                this.addEvent(leftArrows[0].firstChild, 'click', function(e) {M.block_completion_progress.scrollContainer(e.target.parentNode, -1); e.target.stopPagination();})
+                this.addEvent(rightArrows[0].firstChild, 'click', function(e) {M.block_completion_progress.scrollContainer(e.target.parentNode, 1); e.target.stopPagination();})
             }
         }
     },
@@ -85,7 +85,7 @@ M.block_progress = {
         var container = arrow.parentNode;
         var amount = direction * container.scrollWidth * 0.15;
         container.scrollLeft += amount;
-        M.block_progress.checkArrows(container);
+        M.block_completion_progress.checkArrows(container);
     },
 
     addEvent: function(target, evt, func) {
