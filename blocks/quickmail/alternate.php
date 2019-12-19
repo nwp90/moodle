@@ -16,60 +16,67 @@
 
 /**
  * @package    block_quickmail
- * @copyright  2008-2017 Louisiana State University
- * @copyright  2008-2017 Adam Zapletal, Chad Mazilly, Philip Cali, Robert Russo
+ * @copyright  2008 onwards Louisiana State University
+ * @copyright  2008 onwards Chad Mazilly, Robert Russo, Jason Peak, Dave Elliott, Adam Zapletal, Philip Cali
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once '../../config.php';
-require_once 'lib.php';
-require_once 'alt_lib.php';
-require_once 'alt_form.php';
+require_once('../../config.php');
+require_once($CFG->dirroot . '/blocks/quickmail/lib.php');
 
-$courseid = required_param('courseid', PARAM_INT);
-$action = optional_param('action', 'view', PARAM_TEXT);
-$id = optional_param('id', null, PARAM_INT);
-$flash = optional_param('flash', 0, PARAM_INT);
+$pageparams = [
+    'course_id' => optional_param('courseid', 0, PARAM_INT),
+    'action' => optional_param('action', '', PARAM_TEXT),
+    'alternate_id' => optional_param('id', 0, PARAM_INT),
+    'token' => optional_param('token', '', PARAM_TEXT),
+];
 
-$course = $DB->get_record('course', array('id' => $courseid), '*', MUST_EXIST);
+// Authentication and identifying context.
+require_login();
 
-$context = context_course::instance($courseid);
-// Permission
-require_login($course);
-require_capability('block/quickmail:allowalternate', $context);
+// If we're scoping to a specific course.
+if ($pageparams['course_id']) {
+    // If we're scoping to the site level course.
+    if ($pageparams['course_id'] == SITEID) {
+        // Throw an exception if user does not have site-level capability for this block.
+        block_quickmail_plugin::require_user_has_course_message_access($USER, $pageparams['course_id']);
+        // Otherwise, we're scoping to a course.
+    } else {
+        // Throw an exception if user does not have capability of having alternates.
+        block_quickmail_plugin::require_user_capability(
+            'allowalternate',
+            $USER,
+            context_course::instance($pageparams['course_id'])
+        );
+    }
+}
 
-$blockname = quickmail::_s('pluginname');
-$heading = quickmail::_s('alternate');
-$title = "$blockname: $heading";
+$usercontext = context_user::instance($USER->id);
+$PAGE->set_context($usercontext);
+$PAGE->set_url(new moodle_url('/blocks/quickmail/alternate.php', $pageparams));
 
-$url = new moodle_url('/blocks/quickmail/alternate.php', array('courseid' => $courseid));
-
-$PAGE->set_url($url);
-$PAGE->set_context($context);
-$PAGE->set_course($course);
-
-$PAGE->navbar->add($blockname);
-$PAGE->navbar->add($heading);
-
-$PAGE->set_title($title);
-$PAGE->set_heading($title);
-$PAGE->set_pagetype(quickmail::PAGE_TYPE);
+// Construct the page.
+$PAGE->set_pagetype('block-quickmail');
 $PAGE->set_pagelayout('standard');
+$PAGE->set_title(block_quickmail_string::get('pluginname') . ': ' . block_quickmail_string::get('manage_alternates'));
 
-if (!method_exists('quickmail_alternate', $action)) {
-    // Always fallback on view
-    $action = 'view';
+if ($pageparams['course_id']) {
+    $PAGE->navbar->add(
+        block_quickmail_string::get('pluginname'),
+        new moodle_url('/blocks/quickmail/qm.php',
+        array('courseid' => $pageparams['course_id']))
+    );
 }
 
-$body = quickmail_alternate::$action($course, $id);
+$PAGE->navbar->add(block_quickmail_string::get('manage_alternates'));
+$PAGE->set_heading(block_quickmail_string::get('pluginname') . ': ' . block_quickmail_string::get('manage_alternates'));
+$PAGE->requires->css(new moodle_url('/blocks/quickmail/style.css'));
+$PAGE->requires->jquery();
+$PAGE->requires->js(new moodle_url('/blocks/quickmail/js/alternate-form.js'));
 
-echo $OUTPUT->header();
-echo $OUTPUT->heading($heading);
-
-if ($flash) {
-    echo $OUTPUT->notification(get_string('changessaved'), 'notifysuccess');
-}
-
-echo $body;
-
-echo $OUTPUT->footer();
+block_quickmail\controllers\alternate_index_controller::handle($PAGE, [
+    'context' => $usercontext,
+    'user' => $USER,
+    'course_id' => $pageparams['course_id'],
+    'page_params' => $pageparams
+], $pageparams['action']);
