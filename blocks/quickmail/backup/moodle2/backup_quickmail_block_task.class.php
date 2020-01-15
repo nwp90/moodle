@@ -16,31 +16,33 @@
 
 /**
  * @package    block_quickmail
- * @copyright  2008-2017 Louisiana State University
- * @copyright  2008-2017 Adam Zapletal, Chad Mazilly, Philip Cali, Robert Russo
+ * @copyright  2008 onwards Louisiana State University
+ * @copyright  2008 onwards Chad Mazilly, Robert Russo, Jason Peak, Dave Elliott, Adam Zapletal, Philip Cali
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once $CFG->dirroot . '/blocks/quickmail/backup/moodle2/backup_quickmail_stepslib.php';
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot . '/blocks/quickmail/backup/moodle2/backup_quickmail_stepslib.php');
 
 class backup_quickmail_block_task extends backup_block_task {
     protected function define_my_settings() {
-        $include_history = new backup_generic_setting('include_quickmail_log', base_setting::IS_BOOLEAN, FALSE);
-        $include_history->get_ui()->set_label(get_string('backup_history', 'block_quickmail'));
-        $this->add_setting($include_history);
+        $includehistory = new backup_generic_setting('include_quickmail_log', base_setting::IS_BOOLEAN, false);
+        $includehistory->get_ui()->set_label(get_string('backup_history', 'block_quickmail'));
+        $this->add_setting($includehistory);
 
-        $this->plan->get_setting('users')->add_dependency($include_history);
-        $this->plan->get_setting('blocks')->add_dependency($include_history);
+        $this->plan->get_setting('users')->add_dependency($includehistory);
+        $this->plan->get_setting('blocks')->add_dependency($includehistory);
 
-        $include_config_settings = new backup_generic_setting('include_quickmail_config', base_setting::IS_BOOLEAN, true);
-        $include_config_settings->get_ui()->set_label(get_string('backup_block_configuration', 'block_quickmail'));
-        $this->add_setting($include_config_settings);
+        $includeconfigsettings = new backup_generic_setting('include_quickmail_config', base_setting::IS_BOOLEAN, true);
+        $includeconfigsettings->get_ui()->set_label(get_string('backup_block_configuration', 'block_quickmail'));
+        $this->add_setting($includeconfigsettings);
 
-        $this->plan->get_setting('blocks')->add_dependency($include_config_settings);
+        $this->plan->get_setting('blocks')->add_dependency($includeconfigsettings);
     }
 
     protected function define_my_steps() {
-        // TODO: additional steps for drafts and alternate emails
+        // TODO: Additional steps for drafts and alternate emails.
         $this->add_step(new backup_quickmail_block_structure_step('quickmail_structure', 'emaillogs_and_block_configuration.xml'));
     }
 
@@ -53,7 +55,7 @@ class backup_quickmail_block_task extends backup_block_task {
     }
 
     static public function encode_content_links($content) {
-        // TODO: perhaps needing this when moving away from email zip attaches
+        // TODO: Perhaps needing this when moving away from email zip attaches.
         return $content;
     }
 }
