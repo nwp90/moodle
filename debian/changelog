@@ -1,3 +1,12 @@
+moodle-site-otagounifom (3.8.1.2020011300.0facmed1-1) buster; urgency=medium
+
+  * New upstream version
+  * Replace block_progress with block_completion_progress
+  * Update block_quickmail to v2
+  * Fix to mod_questionnaire (unPostgresful syntax)
+
+ -- Nick Phillips <nwp@debian.org>  Wed, 15 Jan 2020 13:29:17 +1300
+
 moodle-site-otagounifom (3.8.0.2019121200.0facmed1-1) buster; urgency=medium
 
   * Update plugins.
