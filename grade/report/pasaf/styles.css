@@ -75,3 +75,70 @@
 }
 
 /* end bootstrapbase bits */
+@media print {
+    @page {
+        margin:0.5cm;
+    }
+    .path-grade-report-pasaf header#page-header div.headerbkg {
+	display: none;
+    }
+    .path-grade-report-pasaf div#page {
+	margin-top: 0;
+    }
+    .path-grade-report-pasaf header#page-header div.card div.headerbkg + div.card-body {
+	height: auto;
+    }
+    .path-grade-report-pasaf div#dock.dock_left_vertical {
+        display:none !important;
+    }
+    .path-grade-report-pasaf div.btn-group.header-button-group {
+        display:none;
+    }
+    .path-grade-report-pasaf #region-main div div.urlselect {
+        display:none;
+    }
+    .path-grade-report-pasaf div.urlselect {
+        display:none;
+    }
+    /* Get rid of "Preferences: PASAF report" which is not individually identifiable :( */
+    .path-grade-report-pasaf div.urlselect + h2 {
+        display:none;
+    }
+    .path-grade-report-pasaf div.groupselector {
+        display:none;
+    }
+    .path-grade-report-pasaf div#graded_users_selector {
+        display:none;
+    }
+    .path-grade-report-pasaf div.view_users_selector {
+        display:none;
+    }
+    .path-grade-report-pasaf section#region-main {
+        width:100%;
+    }
+    .path-grade-report-pasaf div#sitetitle::before {
+        content:“PASAF Report: “;
+    }
+    .path-grade-report-pasaf div#page-navbar {
+        display:none;
+    }
+    .path-grade-report-pasaf #region-main p {
+        page-break-after:auto !important;
+    }
+    .path-grade-report-pasaf table.boxaligncenter.generaltable.user-grade {
+        page-break-after:always !important;
+    }
+    .path-grade-report-pasaf div#sitetitle {
+        font-size:16pt !important;
+        left:0px;
+    }
+    .path-grade-report-pasaf h1 {
+        font-size:16pt !important;
+    }
+    .path-grade-report-pasaf h2 {
+        font-size:14pt !important;
+    }
+    .path-grade-report-pasaf p, body {
+        font-size:8pt !important;
+    }
+}
