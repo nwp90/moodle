@@ -1,3 +1,11 @@
+moodle-site-otagounifom (3.8.2.2020032000.0facmed1-1) buster; urgency=medium
+
+  * New upstream version; security updates
+  * Fixes to print CSS for PASAF report
+  * Fixes to classic theme - d-print-none instead of hidden-print (MDL-68103)
+
+ -- Nick Phillips <nwp@debian.org>  Sat, 21 Mar 2020 09:37:12 +1300
+
 moodle-site-otagounifom (3.8.1.2020011300.0facmed1-1) buster; urgency=medium
 
   * New upstream version
