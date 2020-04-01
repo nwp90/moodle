@@ -128,10 +128,9 @@ class sent_repo extends repo implements sent_repo_interface {
 
         $sql .= ' AND m.is_draft = 0 AND m.timedeleted = 0 AND m.sent_at > 0';
 
-        if (! $as_count) {
-            $sql .= ' ORDER BY ' . $sort_by . ' ' . $sort_dir;
+        if (! $ascount) {
+            $sql .= ' ORDER BY ' . $sortby . ' ' . $sortdir;
         }
-        
         return $sql;
     }
 
