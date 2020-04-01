@@ -194,8 +194,8 @@ class queued_repo extends repo implements queued_repo_interface {
                   AND m.sent_at = 0 
                   AND m.is_draft = 0';
         
-        if (!$as_count) {
-                $sql .= ' ORDER BY ' . $sort_by . ' ' . $sort_dir;
+        if (!$ascount) {
+                $sql .= ' ORDER BY ' . $sortby . ' ' . $sortdir;
         }
 
         return $sql;
