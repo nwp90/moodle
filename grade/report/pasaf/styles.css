@@ -113,6 +113,9 @@
     .path-grade-report-pasaf div.view_users_selector {
         display:none;
     }
+    .path-grade-report-pasaf table.user-grade .column-edit {
+        display:none;
+    }
     .path-grade-report-pasaf section#region-main {
         width:100%;
     }
