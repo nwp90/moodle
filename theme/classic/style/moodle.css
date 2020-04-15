@@ -18827,6 +18827,12 @@ span[data-flexitour="container"][x-placement="right"], span[data-flexitour="cont
     padding: 0 1rem;
     max-width: 20%; } }
 
+@media print {
+  #page-content.blocks-pre.blocks-post .region-main {
+    max-width: 100%;
+    flex: 0 0 100%;
+    padding: 0 1rem 0; } }
+
 .block_myoverview .dashboard-card-deck .dashboard-card,
 .block_recentlyaccesseditems .dashboard-card-deck .dashboard-card {
   width: calc(33.33% - 0.5rem); }
