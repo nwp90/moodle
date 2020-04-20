@@ -127,6 +127,11 @@ function subcourse_fetch_refgrades($subcourseid, $refcourseid, $gradeitemonly = 
                 continue;
             }
             $grade = new grade_grade(array('itemid' => $refgradeitem->id, 'userid' => $user->id));
+
+            if ($grade->hidden) {
+                continue;
+            }
+
             $grade->grade_item =& $refgradeitem;
             $return->grades[$user->id] = new stdClass();
             $return->grades[$user->id]->userid = $user->id;
