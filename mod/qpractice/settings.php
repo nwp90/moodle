@@ -28,13 +28,21 @@ if ($ADMIN->fulltree) {
     $settings->add(new admin_setting_heading(
             'qpractice/questionbehaviours', 'Question Behaviours', '')
     );
+    $settings->add(new admin_setting_configcheckbox('qpractice/systemcontext',
+             get_string('systemcontext', 'qpractice'),
+             get_string('systemcontext_text', 'qpractice'), 0));
 
     $behaviours = question_engine::get_behaviour_options('');
+    $enabled = false;
     foreach ($behaviours as $key => $langstring) {
+        if ($key == 'interactive') {
+            $enabled = true;
+        }
         if (!in_array('correctness', question_engine::get_behaviour_unused_display_options($key))) {
             $settings->add(
-                new admin_setting_configcheckbox('mod_qpractice/' . $key, $key, $langstring, 1)
+                new admin_setting_configcheckbox('mod_qpractice/' . $key, $key, $langstring, $enabled)
             );
+            $enabled = false;
         }
     }
 }

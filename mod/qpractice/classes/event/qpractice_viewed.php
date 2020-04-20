@@ -19,13 +19,14 @@
  *
  * @since     Moodle 2.9
  * @package    mod_qpractice
- * @copyright  2015 Marcus Green
+ * @copyright  2019 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 namespace mod_qpractice\event;
 
 defined('MOODLE_INTERNAL') || die();
+
 
 /**
  * The qpractice_viewed event.

@@ -22,15 +22,15 @@
  * /admin/index.php
  *
  * @package    mod_qpractice
- * @copyright  2013 Jayesh Anandani
+ * @copyright  2019 Marcus Green
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version   = 2019031901;      // The current plugin version (Date: YYYYMMDDXX)
+$plugin->version   = 2019122700;      // The current plugin version (Date: YYYYMMDDXX)
 $plugin->requires  = 2013040500;      // Requires this Moodle version.
 $plugin->cron      = 0;               // Period for cron to check this plugin (secs)
 $plugin->component = 'mod_qpractice'; // To check on upgrade, that plugin sits in correct place.
 $plugin->maturity  = MATURITY_STABLE;
-$plugin->release   = '1.2';
+$plugin->release   = '1.3';
