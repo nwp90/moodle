@@ -79,4 +79,14 @@ $capabilities = [
                         'manager' => CAP_ALLOW
                 ]
         ],
+
+        'mod/publication:receiveteachernotification' => [
+            'captype' => 'read',
+            'contextlevel' => CONTEXT_MODULE,
+            'archetypes' => [
+                'teacher' => CAP_ALLOW,
+                'editingteacher' => CAP_ALLOW,
+                'manager' => CAP_ALLOW
+            ]
+        ],
 ];

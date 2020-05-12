@@ -1,8 +1,46 @@
 CHANGELOG
 =========
 
+3.8.1 (2020-02-18)
+------------------
+
+* [BUG] #6594 uploaded files are now approved automatically, if specified in the settings
+* [BUG] #6380 pagination now fixed to predefined values (all/10/20/50/100)
+
+
+3.8.0 (2020-01-05)
+------------------
+
+* [BUG] #6492 fixed bug which caused fatal error when opening reports / dates
+* [FEATURE] #4641 table is now sortable by approval selection
+* [FIXED] #6381 Fix typo in receiveteachernotification langstring
+
+
+3.7.1 (2019-10-04)
+------------------
+
+* [FIXED] #6295 Fix typo in receiveteachernotification capability and add langstring for it
+* [FIXED] #6333 Images are now shown in the description
+* [FIXED] #6250 Fix typo in 'extended' [github pull #32 @germanvaleroelizondo]
+* [FIXED] #6209 space added between save approval and revert button
+* [FEATURE] #6208 approval select boxes are now left of column instead of center
+* [FIXED] #6205 list of files and approval select boxes are now aligned
+
+
+3.7.0 (2019-08-07)
+------------------
+
+* [BUG] #6207 publication layout bug after changing approval fixed
+* [BUG] #6206 notifications with groups fixed
+* [FEATURE] #6126 added support for report-editdates
+* [FEATURE] #4995 notification on file-status change for student
+* [FEATURE] #4730 notification on file-upload for teacher
+* [FEATURE] #4731 extended logs
+
+
 3.6.1 (2019-05-15)
 ------------------
+
 * [FIXED] #6015 remove setting to show id
 * [FIXED] #6035 auto-reload on groupfilter-change
 
