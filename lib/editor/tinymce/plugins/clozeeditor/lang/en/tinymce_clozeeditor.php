@@ -15,10 +15,9 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Strings for component 'atto_cloze', language 'en'.
+ * Strings for component 'tinymce_clozeeditor', language 'en'.
 
- * @package    tiny_mce
- * @subpackage clozeeditor
+ * @package    tinymce_clozeeditor
  * @copyright  2013 Andreas Glombitza/Achim Skuta
  * @copyright  2018 onwards Germán Valero <gvalero@unam.mx>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
