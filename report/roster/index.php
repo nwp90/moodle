@@ -25,13 +25,13 @@
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__) . '/locallib.php');
 
-$id          = required_param('id', PARAM_INT);
-$mode        = optional_param('mode', ROSTER_MODE_DISPLAY, PARAM_TEXT);
-$group       = optional_param('group', 0, PARAM_INT);
-$role        = optional_param('role', 0, PARAM_INT);
-$defaultsize = get_config('report_roster', 'size_' . get_config('report_roster', 'size_default'));
-$size        = optional_param('size', $defaultsize, PARAM_INT);
-$course      = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
+$id       = required_param('id', PARAM_INT);
+$mode     = optional_param('mode', ROSTER_MODE_DISPLAY, PARAM_TEXT);
+$group    = optional_param('group', 0, PARAM_INT);
+$role     = optional_param('role', 0, PARAM_INT);
+$autosize = report_roster_resolve_auto_size();
+$size     = optional_param('size', $autosize, PARAM_INT);
+$course   = $DB->get_record('course', array('id' => $id), '*', MUST_EXIST);
 
 require_login($course);
 
@@ -59,13 +59,25 @@ if ($role > 0) {
 $suspended = get_suspended_userids($coursecontext);
 
 $data = array();
+$fields = explode("\n", get_config('report_roster', 'fields'));
+
 foreach ($userlist as $user) {
-    if (!in_array($user->id, $suspended)) {
-        $item = $OUTPUT->user_picture($user, array('size' => $size, 'courseid' => $course->id));
-        $item .= html_writer::tag('span', fullname($user));
-        $item .= get_config('report_roster', 'show_username') ? html_writer::tag('span', $user->username) : '';
-        $data[] = $item;
+    // If user is suspended, skip them.
+    if (in_array($user->id, $suspended)) {
+        continue;
     }
+
+    // Get user picture and profile data.
+    $item = $OUTPUT->user_picture($user, array('size' => $size, 'courseid' => $course->id));
+    profile_load_data($user);
+
+    // Loop through configured display fields and add them.
+    foreach ($fields as $field) {
+        $value = report_roster_process_field($field, $user);
+        $item .= !empty($value) ? html_writer::tag('span', $value) : '';
+    }
+
+    $data[] = $item;
 }
 
 // Finish setting up page.
