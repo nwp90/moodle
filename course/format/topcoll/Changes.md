@@ -1,5 +1,109 @@
 ﻿Version Information
 ===================
+Version 3.8.1.0 - 31/03/2020
+  1. Fix 'Section edit link is moved on top of previous sections edit link when deleting a section' - CONTRIB-7957.
+  2. Fix 'Multiple columns changes to one column for students when last section is set to hidden' - CONTRIB-8008.
+  3. Fix current section bar overlap.
+
+Version 3.8.0.1
+  1. Fix Collapsed topics format zoom issue - CONTRIB-7893.
+  2. Adjust position of 'view only' icon.
+  3. More accessible open all / close all - #67.
+  4. Moodle 3.8 version based on V3.7.1.1.
+
+Version 3.7.1.0
+  1. Add missing Moodle define.
+  2. Fix "Collapsed Topic Content/EditMenu Overlap" - https://moodle.org/mod/forum/discuss.php?d=388969.
+  3. Fix error with analytic - get_section_dates function - thanks to https://github.com/tuanngocnguyen for the patch - #65.
+  4. Improve accessibility by having the 'left', 'content' and 'right' section areas in that order rather than 'left', 'right' and 'content'
+     which makes the tab order wrong.
+
+Version 3.7.0.1
+  1. Beta version for Moodle 3.7 based on 3.6.0.3.
+
+Version 3.6.0.3
+  1. Apply MDL-64819 - #61.
+  2. Fix phpunit tests for MDL-64492 - thanks to Rossco Hellmans for the patch - #59.
+  3. Added SVG version of one section icon - thanks to Luca Bösch for the patch - #60.
+  4. New: Accordion/Collapsed Topic aria attributes improvements - thanks to John Y for the patch - #62 and #63.
+  5. Fix position of activity / resource editing menu.
+  6. Change position of the window when clicking on a section anchor such that a navbar would not be in the way.
+     Thanks for the information in the Adaptable theme referencing: https://github.com/twbs/bootstrap/issues/1768.
+  7. Added the course and admin settings to enable or disable the toggle all functionality.  Reset in the 'layout'
+     area with associated capability for non-admins.
+  8. Added the course and admin settings to enable or disable the view single section functionality.  Reset in the
+     'layout' area with associated capability for non-admins.
+
+Version 3.6.0.2
+  1. Fix invalid HTML in case of zero section elements - thanks to Mario Wehr for raising this - #47.
+  2. Fix: PHP Unit test failure (due to MDL-62680) - thanks to Anupama Dharmajan for the patch - #52.
+  3. Fix: Two strange input fields remain in teacher view when all capabilities are forbidden - thanks to Tobias Reischmann for the patch - #54.
+  4. Fix: Selecting specific topics breaks a section just above the selected topic - CONTRIB-7607.
+  5. New: Improve accessibility of the open and close all buttons - thanks to Rossco Hellmans for the patch - #56.
+  6. New: Based on '5', add key operation of toggles.
+
+Version 3.6.0.1
+  1. Beta version for Moodle 3.6.
+
+Version 3.5.0.3
+  1. Fix CONTRIB-7434:
+        With reference to 'global_start_keyboard_drag' and 'find_element_text' in /lib/yui/src/dragdrop/js/dragdrop.js
+        and 'initializer' of /course/yui/src/dragdrop/js/resource.js this is down to the 'droptargets' list not containing
+        a node that contains the section name because CT has broken down the section content into two separate sub-sections
+        and other core course formats only have the one section containing the section markup.  Therefore the solution effectively
+        allows 'find_element_text' to find the hidden section name first within the 'labelroot' node that is determined.
+  2. When accessing a module through a single section page (not the navigation block) then ensure that you are returned
+     to the same single section page when using the breadcrumb.
+  3. Fix 'Edit section name button disappearing when moving section and Toggle word added' - #44 - with thanks to
+     Joshua Ebarvia - https://github.com/jebarviabb - for the patch.
+
+Version 3.5.0.2
+  1. Tidy up one section icon.
+  2. Fix CONTRIB-7393.
+  3. Treat themes using Boost as a parent the same as Boost - thanks to Tony Butler.
+
+Version 3.5.0.1
+  1. M3.5 version based on V3.4.0.2.
+  2. Put back 'numsections'.
+
+Version 3.4.0.2
+  1. Fix colour popup form element not rendering correctly in Boost theme.
+  2. Apply MDL-60241 course: General section always visible.
+  3. Support Privacy API.
+  4. Fix #40.
+
+Version 3.4.0.1
+  1. First beta version for M3.4.
+
+Version 3.3.1.1
+  1. Revert MDL-55074 by applying MDL-57412 - #30.
+  2. Fix CONTRIB-7056 - Edit menu cut off for some activities when using collapsed topics and boost.
+  3. Apply MDL-35628 - thanks to Skylar Kelty for the patch.
+
+Version 3.3.1.0
+  1. Fix missing reset course settings.
+  2. Add 'numsections' coping restore code from Topics format.
+  3. Fix toggle all cursor.
+  4. Add folder icon from /pix/f.
+  5. One section only.
+  6. Remove 'coursedisplay' setting favour of combining the two and adding a link on the right of the toggle.
+  7. Add opactity option for all four toggle colour settings.
+  8. private or protected - #31.
+  9. Fix Boost theme :target CSS conflict.
+
+Version 3.3.0.2
+  1. Make the 'readme' course setting only display and not store in the database, thus regenerate and not broken in the
+     course backup.
+  2. Fix not being able to tab to colour settings.
+  3. Implement MDL-4782.  Ref: 'https://docs.moodle.org/33/en/Stealth_activities' - 'allowstealth' admin setting.
+  4. Apply MDL-55074 - #30.
+
+Version 3.3.0.1
+  1. Apply MDL-58637.
+  2. pix_url to pix_icon.
+  3. Fix section move name not changing.
+  4. Apply MDL-57769.
+
 Version 3.2.1.0
   1. Remove old 'format_topcoll_delete_course' function and replace with '\core\event\course_content_deleted' event.
   2. Add Boost theme specific style sheet - not the best of solutions but only one at the moment I can think of.
@@ -173,7 +277,7 @@ Version 2.8.2.2
   1. First beta version for Moodle 2.7beta.
 
 17th April 2014 Version 2.6.1.5
-  1. Fixed CONTRIB-4099 with the arrangement of the editing icon and associated functionality such that a better solution is
+  1. Fixed CONTRIB-4999 with the arrangement of the editing icon and associated functionality such that a better solution is
      applied for the specific nature of the format.
 
 28th March 2014 Version 2.6.1.4
