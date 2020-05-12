@@ -1046,7 +1046,7 @@ class rate extends question {
 
         // If we're doing this step, let's do it.
         if (!$skip) {
-            $select = 'UPDATE {questionnaire_response_rank} qr ' .
+            $select = 'UPDATE {questionnaire_response_rank} ' .
                 'SET rankvalue = (rankvalue + 1) ' .
                 'WHERE (rankvalue >= 0)';
             if ($surveyid !== null) {
