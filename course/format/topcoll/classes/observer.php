@@ -22,12 +22,11 @@
  * Toggles are persistent on a per browser session per course basis but can be made to persist longer by a small
  * code change. Full installation instructions, code adaptions and credits are included in the 'Readme.txt' file.
  *
- * @package    course/format
- * @subpackage topcoll
+ * @package    format_topcoll
  * @category   event
- * @version    See the value of '$plugin->version' in below.
+ * @version    See the value of '$plugin->version' in version.php.
  * @copyright  &copy; 2017-onwards G J Barnard based upon work done by Marina Glancy.
- * @author     G J Barnard - gjbarnard at gmail dot com and {@link http://moodle.org/user/profile.php?id=442195}
+ * @author     G J Barnard - {@link http://moodle.org/user/profile.php?id=442195}
  * @link       http://docs.moodle.org/en/Collapsed_Topics_course_format
  * @license    http://www.gnu.org/copyleft/gpl.html GNU Public License
  *
@@ -50,6 +49,6 @@ class format_topcoll_observer {
      */
     public static function course_content_deleted(\core\event\course_content_deleted $event) {
         global $DB;
-        $DB->delete_records("user_preferences", array("name" => 'topcoll_toggle_'.$event->objectid)); // $courseid.
+        $DB->delete_records("user_preferences", array("name" => 'topcoll_toggle_'.$event->objectid)); // This is the $courseid.
     }
 }
