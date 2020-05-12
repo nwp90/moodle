@@ -13,9 +13,22 @@ Must set the following settings to enable the plugin:
 * Zoom API key (mod_zoom | apikey)
 * Zoom API secret (mod_zoom | apisecret)
 * Zoom home page URL (mod_zoom | zoomurl), Link to your organization's custom Zoom landing page.
-* Login types (mod_zoom | logintypes), Depending on your Zoom instance, how should the plug-in find users from Moodle in Zoom?
 
 ## Changelog
+
+v2.2
+* Resized svg icon (Thanks stopfstedt)
+* Fixed error handling for 'User not found on this account' (Thanks nstefanski and tzerafnx)
+* Incorrect return value for zoom_update_instance (Thanks jrchamp)
+* Added global search support
+* Fixed inconsistent "start_time" column (Thanks tuanngocnguyen)
+
+v2.1
+* Moodle 3.7 support (Thanks danmarsden) 
+* Privacy API support
+* Moodle mobile support fixed for 3.5 (Thanks nstefanski)
+* iCal generation
+* Various bug fixes/improvements.
 
 v2.0.1
 

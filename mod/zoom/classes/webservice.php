@@ -29,11 +29,16 @@ require_once($CFG->dirroot.'/lib/filelib.php');
 
 // Some plugins already might include this library, like mod_bigbluebuttonbn.
 // Hacky, but need to create whitelist of plugins that might have JWT library.
+// NOTE: Remove file_exists checks and the JWT library in mod when versions prior to Moodle 3.7 is no longer supported
 if (!class_exists('Firebase\JWT\JWT')) {
-    if (file_exists($CFG->dirroot.'/mod/bigbluebuttonbn/vendor/firebase/php-jwt/src/JWT.php')) {
-        require_once($CFG->dirroot.'/mod/bigbluebuttonbn/vendor/firebase/php-jwt/src/JWT.php');
+    if (file_exists($CFG->dirroot.'/lib/php-jwt/src/JWT.php')) {
+        require_once($CFG->dirroot.'/lib/php-jwt/src/JWT.php');
     } else {
-        require_once($CFG->dirroot.'/mod/zoom/jwt/JWT.php');
+        if (file_exists($CFG->dirroot.'/mod/bigbluebuttonbn/vendor/firebase/php-jwt/src/JWT.php')) {
+            require_once($CFG->dirroot.'/mod/bigbluebuttonbn/vendor/firebase/php-jwt/src/JWT.php');
+        } else {
+            require_once($CFG->dirroot.'/mod/zoom/jwt/JWT.php');
+        }
     }
 }
 
@@ -165,21 +170,27 @@ class mod_zoom_webservice {
         $aggregatedata = array();
         $data['page_size'] = ZOOM_MAX_RECORDS_PER_CALL;
         $reportcheck = explode('/', $url);
+        $isreportcall = in_array('report', $reportcheck);
         // The $currentpage call parameter is 1-indexed.
         for ($currentpage = $numpages = 1; $currentpage <= $numpages; $currentpage++) {
             $data['page_number'] = $currentpage;
             $callresult = null;
-            $numcalls = get_config('mod_zoom', 'calls_left');
-            if (in_array('report', $reportcheck) && $numcalls > 0) {
-                $callresult = $this->_make_call($url, $data);
-                set_config('calls_left', $numcalls - 1, 'mod_zoom');
-                sleep(1);
+            if ($isreportcall) {
+                $numcalls = get_config('mod_zoom', 'calls_left');
+                if ($numcalls > 0) {
+                    $callresult = $this->_make_call($url, $data);
+                    set_config('calls_left', $numcalls - 1, 'mod_zoom');
+                    sleep(1);
+                }
             } else {
                 $callresult = $this->_make_call($url, $data);
             }
-            $aggregatedata += $callresult->$datatoget;
-            // Note how continually updating $numpages accomodatess for the edge case that users are added in between calls.
-            $numpages = $callresult->page_count;
+
+            if ($callresult) {
+                $aggregatedata = array_merge($aggregatedata, $callresult->$datatoget);
+                // Note how continually updating $numpages accomodates for the edge case that users are added in between calls.
+                $numpages = $callresult->page_count;
+            }
         }
 
         return $aggregatedata;
@@ -288,22 +299,17 @@ class mod_zoom_webservice {
      * @link https://zoom.github.io/api/#users
      */
     public function get_user($identifier) {
-        $logintypes = get_config('mod_zoom', 'logintypes');
-        $allowedtypes = explode(',', $logintypes);
         $founduser = false;
-        
+
         $url = 'users/' . $identifier;
 
-        foreach ($allowedtypes as $logintype) {
-            try {
-                $data = ['login_type' => $logintype];
-                $founduser = $this->_make_call($url, $data);
-            } catch (moodle_exception $error) {
-                if (zoom_is_user_not_found_error($error->getMessage())) {
-                    continue;
-                } else {
-                    throw $error;
-                }
+        try {
+            $founduser = $this->_make_call($url);
+        } catch (moodle_exception $error) {
+            if (zoom_is_user_not_found_error($error->getMessage())) {
+                return false;
+            } else {
+                throw $error;
             }
         }
 
