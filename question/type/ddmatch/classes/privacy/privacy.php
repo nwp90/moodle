@@ -15,19 +15,31 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Privacy Subsystem implementation for format_tabtopics.
+ *
  * @package    qtype_ddmatch
- * @copyright  2007 Adriane Boyd (adrianeboyd@gmail.com)
+ * @copyright  2019 Amr Hourani <amr.hourani@let.ethz.ch>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace qtype_ddmatch\privacy;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'qtype_ddmatch';
-$plugin->version   = 2020041701;
-
-$plugin->requires  = 2013050100;
-$plugin->dependencies = array(
-    'qtype_match' => 2015111600,
-);
-$plugin->release = '2.0 Drag and drop matching question for Moodle 3.6, 3.7, 3.8';
-$plugin->maturity  = MATURITY_STABLE;
+/**
+ * The format_tabtopics
+ *
+ */
+class provider implements \core_privacy\local\metadata\null_provider
+{
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return string
+     */
+    public static function get_reason(): string
+    {
+        return 'privacy:metadata';
+    }
+}

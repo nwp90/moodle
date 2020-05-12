@@ -16,7 +16,7 @@ YUI.add('moodle-qtype_ddmatch-dragdrop', function(Y, NAME) {
                 return;
             }
 
-            var containerid = "div[id^='question-'][id$='-"+this.get('questionid')+"']",
+            var containerid = '#' + this.get('questionid'),
                 group = containerid + ' .matchtarget';
 
             // Set the container - we use this in various places
