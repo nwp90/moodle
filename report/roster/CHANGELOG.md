@@ -1,5 +1,15 @@
 # Changelog
 
+## 3.6.1 (January 15, 2020)
+
+- [Improvement] More robust user image size defaulting
+- [Bugfix] All fields now display, not just the last one
+
+## 3.6.0 (January 10, 2020)
+
+- Dropped support for Moodle 3.5
+- [Feature] Make the displayed user fields configurable
+
 ## 3.5.0 (September 16, 2019)
 
 - Dropped support for Moodle 3.4

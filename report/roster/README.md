@@ -5,7 +5,7 @@
 This is a simple report which displays the user pictures for everyone enrolled in the given course.
 
 ## Requirements
-- Moodle 3.5 (build 2018051700 or later)
+- Moodle 3.6 (build 2018120300 or later)
 
 ## Installation
 Copy the roster folder into your /report directory and visit your Admin Notification page to complete the installation.
@@ -15,7 +15,7 @@ There are several options available to the admin from the Roster Report settings
 
 ### General
 
-**Show username:** If enabled, username will be shown below full name in the Roster Report.
+**Profile fields to display:** A newline separated list of profile fields to display. `fullname` is also supported. Note that custom profile fields must be entered as `profile_field_{shortname}`.
 
 **Display name:** The display string used by the Roster Report on the front end. Will appear in the flat navigation (if enabled) and on the Roster Report page.
 
@@ -27,7 +27,11 @@ There are several options available to the admin from the Roster Report settings
 
 ### User Image Size
 
-**Default size:** The default size, in pixels, of the user images in the Roster Report. Should match one of the three size level options below. This is the size that will be used when a user first navigates to the report and has not requested a specific size yet.
+Any size set to `0` will not display in the drop-down on the report page. If there is only one non-zero size option, the drop-down will not be displayed.
+
+On initial load of the report page, the report will attempt to use the size configured as default. If this size is 0, the report will fall back to the next highest size option. If all three size options are `0`, the size will hard default to 100.
+
+**Default size:** The default size of the user images in the Roster Report.
 
 **Size: Small:** The size, in pixels, of the user images when the user has selected "Small".
 
