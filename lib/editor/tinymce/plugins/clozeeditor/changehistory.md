@@ -1,4 +1,13 @@
 # CHANGE HISTORY
+
+## 01 April 2020. v3.8r02
+* Started to fix warnings reported by Moodle plugins database report.
+* Simple update date and version.
+
+## 27 December 2019. v3.8r1
+* Started to fix warnings reported by Moodle plugins database report.
+* Started with file dialog.php by splitting two very long lines
+
 ## 14 January 2019. v3.5r7
 * Started to fix warnings reported by Moodle code checker plugin in JS files
 * Managed to fix all warnings except for two where Line exceeds 132 characters:
