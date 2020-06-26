@@ -23,7 +23,7 @@
  */
 
 $capabilities = array(
-    'assignsubmission/gradereviews:canreviewgrade' => array(
+    'assign/submission:canreviewgrade' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
@@ -31,7 +31,7 @@ $capabilities = array(
             'editingteacher' => CAP_ALLOW
         )
     ),
-    'assignsubmission/gradereviews:caneditreviewgrade' => array(
+    'assign/submission:caneditreviewgrade' => array(
         'captype' => 'write',
         'contextlevel' => CONTEXT_USER,
         'archetypes' => array(
