@@ -23,6 +23,7 @@
  */
 
 $string['pluginname'] = 'Resort question categories';
+$string['privacy:metadata'] = 'The plugin does not store any personal data.';
 $string['resortcategory'] = 'Sort categories';
 $string['resortthiscategory'] = 'Sort this category';
 $string['selectcategory'] = 'Select category to sort';

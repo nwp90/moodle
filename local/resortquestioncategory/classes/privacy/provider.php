@@ -15,17 +15,35 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Tool for sorting question categories in alphabetical order.
+ * Tool for deleting question category with question and subcategories.
  *
  * @package    local_resortquestioncategory
- * @copyright  2016 Vadim Dvorovenko <Vadimon@mail.ru>
+ * @copyright  2020 Vadim Dvorovenko <Vadimon@mail.ru>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+namespace local_resortquestioncategory\privacy;
+
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->component = 'local_resortquestioncategory';
-$plugin->version   = 2020061300;
-$plugin->release = '1.1';
-$plugin->maturity = MATURITY_STABLE;
-$plugin->requires  = 2015111600; // Moodle 3.0.
+/**
+ * Tool for deleting question category with question and subcategories.
+ *
+ * @package    local_resortquestioncategory
+ * @copyright  2020 Vadim Dvorovenko <Vadimon@mail.ru>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ */
+class provider implements \core_privacy\local\metadata\null_provider {
+
+    use \core_privacy\local\legacy_polyfill;
+
+    /**
+     * Get the language string identifier with the component's language
+     * file to explain why this plugin stores no data.
+     *
+     * @return  string
+     */
+    public static function _get_reason() {
+        return 'privacy:metadata';
+    }
+}
