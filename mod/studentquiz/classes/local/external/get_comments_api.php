@@ -87,6 +87,7 @@ class get_comments_api extends external_api {
      * @param int $questionid - Question ID.
      * @param int $cmid - CM ID.
      * @param int $numbertoshow - Number comments to show.
+     * @param string $sort - Type of sort.
      * @return array
      */
     public static function get_comments($questionid, $cmid, $numbertoshow, $sort) {
@@ -99,7 +100,7 @@ class get_comments_api extends external_api {
         ]);
 
         list($question, $cm, $context, $studentquiz) = utils::get_data_for_comment_area($params['questionid'], $params['cmid']);
-
+        self::validate_context($context);
         $commentarea = new container($studentquiz, $question, $cm, $context, null, $sort);
         $comments = $commentarea->fetch_all($numbertoshow);
 

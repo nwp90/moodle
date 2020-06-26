@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<XMLDB PATH="mod/studentquiz/db" VERSION="20200116" COMMENT="XMLDB file for Moodle mod/studentquiz"
+<XMLDB PATH="mod/studentquiz/db" VERSION="20200504" COMMENT="mod_studentquiz database layout"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
 >
   <TABLES>
-    <TABLE NAME="studentquiz" COMMENT="Default comment for studentquiz, please edit me">
+    <TABLE NAME="studentquiz" COMMENT="studentquiz activity">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="course" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Course studentquiz activity belongs to"/>
@@ -16,7 +16,6 @@
         <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
         <FIELD NAME="grade" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="100" SEQUENCE="false" COMMENT="The maximum grade. Can be negative to indicate the use of a scale."/>
         <FIELD NAME="anonymrank" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Setting to show ranking anonym or not."/>
-        <FIELD NAME="quizpracticebehaviour" TYPE="char" LENGTH="32" NOTNULL="true" SEQUENCE="false" COMMENT="Displays the question behaviour selected by teachers"/>
         <FIELD NAME="questionquantifier" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Point factor multiplied with number of questions contributed"/>
         <FIELD NAME="approvedquantifier" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Point factor multiplied with the number of approved questions created"/>
         <FIELD NAME="ratequantifier" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Point factor multiplied with average rating per question"/>
@@ -34,6 +33,8 @@
         <FIELD NAME="publishnewquestion" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Setting to automatically publish new created question"/>
         <FIELD NAME="commentdeletionperiod" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="10" SEQUENCE="false" COMMENT="Define deletion period for user can able to delete a comment."/>
         <FIELD NAME="reportingemail" TYPE="char" LENGTH="255" NOTNULL="false" SEQUENCE="false" COMMENT="Email address for reporting unacceptable comments"/>
+        <FIELD NAME="digesttype" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Email digest type"/>
+        <FIELD NAME="digestfirstday" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="First day of week"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -90,13 +91,15 @@
         <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of user"/>
         <FIELD NAME="created" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
         <FIELD NAME="parentid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
-        <FIELD NAME="deleted" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Deleted time"/>
-        <FIELD NAME="deleteuserid" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Id of user deleted comment"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Status of comment: 0 - created, 1 - edited, 2 - deleted."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="Time modified."/>
+        <FIELD NAME="usermodified" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="questionid" TYPE="foreign" FIELDS="questionid" REFTABLE="question" REFFIELDS="id"/>
+        <KEY NAME="usermodified" TYPE="foreign" FIELDS="usermodified" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
       <INDEXES>
         <INDEX NAME="userid" UNIQUE="false" FIELDS="userid"/>
@@ -104,21 +107,20 @@
         <INDEX NAME="parentid" UNIQUE="false" FIELDS="parentid" COMMENT="Parent ID of comment index."/>
       </INDEXES>
     </TABLE>
-    <TABLE NAME="studentquiz_practice" COMMENT="Store quiz practices">
+    <TABLE NAME="studentquiz_comment_history" COMMENT="Store the history of comments.">
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
-        <FIELD NAME="quizcoursemodule" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="studentquizcoursemodule" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false"/>
-        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of user"/>
+        <FIELD NAME="commentid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Id of the comment."/>
+        <FIELD NAME="content" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="Content."/>
+        <FIELD NAME="userid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="User Id."/>
+        <FIELD NAME="action" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Action: 0 - Create, 1 - Edit, 2 - Delete."/>
+        <FIELD NAME="timemodified" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Time modified."/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="commentid" TYPE="foreign" FIELDS="commentid" REFTABLE="studentquiz_comment" REFFIELDS="id"/>
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
-      <INDEXES>
-        <INDEX NAME="quizcoursemodule" UNIQUE="false" FIELDS="quizcoursemodule"/>
-        <INDEX NAME="studentquizcoursemodule" UNIQUE="false" FIELDS="studentquizcoursemodule"/>
-      </INDEXES>
     </TABLE>
     <TABLE NAME="studentquiz_question" COMMENT="Store question related properties">
       <FIELDS>
@@ -147,6 +149,21 @@
         <KEY NAME="userid" TYPE="foreign" FIELDS="userid" REFTABLE="user" REFFIELDS="id"/>
         <KEY NAME="questionusageid" TYPE="foreign" FIELDS="questionusageid" REFTABLE="question_usages" REFFIELDS="id"/>
         <KEY NAME="categoryid" TYPE="foreign" FIELDS="categoryid" REFTABLE="question_categories" REFFIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="studentquiz_notification" COMMENT="Notification queue">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="studentquizid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="StudentQuiz id"/>
+        <FIELD NAME="content" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="Notification content"/>
+        <FIELD NAME="recipientid" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="Recipient Id"/>
+        <FIELD NAME="status" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Status of the notification"/>
+        <FIELD NAME="timetosend" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Time to send the notification"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+        <KEY NAME="studentquizid" TYPE="foreign" FIELDS="studentquizid" REFTABLE="studentquiz" REFFIELDS="id"/>
+        <KEY NAME="recipientid" TYPE="foreign" FIELDS="recipientid" REFTABLE="user" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
   </TABLES>

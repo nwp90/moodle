@@ -51,14 +51,14 @@ const STUDENTQUIZ_COURSE_SECTION_SUMMARY = 'all student quizzes';
 const STUDENTQUIZ_COURSE_SECTION_SUMMARYFORMAT = 1;
 /** @var string default course section visible for the orphaned activities */
 const STUDENTQUIZ_COURSE_SECTION_VISIBLE = false;
-/** @var string default StudentQuiz quiz practice behaviour */
+/** @var string default StudentQuiz quiz behaviour */
 const STUDENTQUIZ_DEFAULT_QUIZ_BEHAVIOUR = 'immediatefeedback';
 
 /**
  * Load studentquiz from coursemodule id
  *
- * @param int cmid course module id
- * @param int context id id of the context of this course module
+ * @param int $cmid course module id
+ * @param int $contextid id of the context of this course module
  * @return stdClass|bool studentquiz or false
  * TODO: Should we refactor dependency on questionlib by inserting category as parameter?
  */
@@ -81,7 +81,19 @@ function mod_studentquiz_load_studentquiz($cmid, $contextid) {
     return false;
 }
 
-function mod_studentquiz_get_studenquiz_progress_class($questionid, $userid, $studentquizid, $lastanswercorrect = 0, $attempts = 0, $correctattempts = 0) {
+/**
+ * Make studentquiz progress object
+ *
+ * @param int $questionid
+ * @param int $userid
+ * @param int $studentquizid
+ * @param int $lastanswercorrect
+ * @param int $attempts
+ * @param int $correctattempts
+ * @return stdClass
+ */
+function mod_studentquiz_get_studenquiz_progress_class($questionid, $userid, $studentquizid, $lastanswercorrect = 0,
+    $attempts = 0, $correctattempts = 0) {
     $studentquizprogress = new stdClass();
     $studentquizprogress->questionid = $questionid;
     $studentquizprogress->userid = $userid;
@@ -152,7 +164,7 @@ function mod_studentquiz_migrate_all_studentquiz_instances_to_aggregated_state($
 /**
  * Migrate a single studentquiz instance to aggregated state
  *
- * @param $studentquiz
+ * @param stdClass $studentquiz
  * @throws coding_exception
  * @throws dml_exception
  */
@@ -204,8 +216,10 @@ function mod_studentquiz_get_studentquiz_progress_from_question_attempts_steps($
                      FROM {question_usages} qu_last
                      JOIN {question_attempts} qa_last ON qa_last.questionusageid = qu_last.id
                      JOIN {question_attempt_steps} qas_last ON qas_last.questionattemptid = qa_last.id
-                    WHERE qu_last.contextid = :contextid2 AND qa_last.questionid = innerq.questionid AND qas_last.userid = innerq.userid
-                          AND qas_last.state IN (:rightstate1, :partialstate1, :wrongstate1)
+                    WHERE qu_last.contextid = :contextid2
+                      AND qa_last.questionid = innerq.questionid
+                      AND qas_last.userid = innerq.userid
+                      AND qas_last.state IN (:rightstate1, :partialstate1, :wrongstate1)
                    )";
     $records = $DB->get_recordset_sql($sql, array(
             'rightstate2' => (string) question_state::$gradedright, 'rightstate3' => (string) question_state::$gradedright,
@@ -237,6 +251,8 @@ function mod_studentquiz_get_quiz_module_id() {
 
 /**
  * Check if user has permission to see creator
+ *
+ * @param int $cmid
  * @return bool
  */
 function mod_studentquiz_check_created_permission($cmid) {
@@ -246,6 +262,7 @@ function mod_studentquiz_check_created_permission($cmid) {
 
 /**
  * Prepare message for notify.
+ *
  * @param stdClass $question object
  * @param stdClass $recepient user object receiving the notification
  * @param int $actor user object triggering the notification
@@ -253,7 +270,6 @@ function mod_studentquiz_check_created_permission($cmid) {
  * @param stdClass $module course module object
  * @return stdClass Data object with course, module, question, student and teacher info
  */
-
 function mod_studentquiz_prepare_notify_data($question, $recepient, $actor, $course, $module) {
     // Get StudentQuiz.
     $context = context_module::instance($module->id);
@@ -271,6 +287,7 @@ function mod_studentquiz_prepare_notify_data($question, $recepient, $actor, $cou
 
     // Module info.
     $data->modulename      = $module->name;
+    $data->moduleid = $module->id;
 
     // Question info.
     $data->questionname    = $question->name;
@@ -295,6 +312,10 @@ function mod_studentquiz_prepare_notify_data($question, $recepient, $actor, $cou
         $data->recepientname = get_string('creator_anonym_fullname', 'studentquiz');
         $data->actorname = get_string('manager_anonym_fullname', 'studentquiz');
     }
+
+    // Notification settings.
+    $data->digesttype = $studentquiz->digesttype;
+    $data->digestfirstday = $studentquiz->digestfirstday;
 
     return $data;
 }
@@ -327,8 +348,7 @@ function mod_studentquiz_state_notify($questionid, $course, $module, $type) {
 
 /**
  * Notify student that someone has commented to his question. (Info to question author)
- * @param stdClass comment that was just added to the question
- * @param int $questionid ID of the student's questions.
+ * @param stdClass $comment that was just added to the question
  * @param stdClass $course course object
  * @param stdClass $module course module object
  * @return bool True if sucessfully sent, false otherwise.
@@ -340,8 +360,7 @@ function mod_studentquiz_notify_comment_added($comment, $course, $module) {
 /**
  * Notify student that someone has deleted their comment to his question. (Info to question author)
  * Notify student that someone has deleted his comment to someone's question. (Info to comment author)
- * @param stdClass comment that was just added to the question
- * @param int $questionid ID of the student's questions.
+ * @param stdClass $comment that was just added to the question
  * @param stdClass $course course object
  * @param stdClass $module course module object
  * @return bool True if sucessfully sent, false otherwise.
@@ -380,7 +399,7 @@ function mod_studentquiz_event_notification_question($event, $questionid, $cours
 /**
  * Notify question author that an event occured when the autor has this capabilty
  * @param string $event The name of the event, used to automatically get capability and mail contents
- * @param stdClass comment that was just added to the question
+ * @param stdClass $comment that was just added to the question
  * @param stdClass $course course object
  * @param stdClass $module course module object
  * @return bool True if sucessfully sent, false otherwise.
@@ -401,7 +420,7 @@ function mod_studentquiz_event_notification_comment($event, $comment, $course, $
         $data->commenttext = $comment->comment;
         $data->commenttime = userdate($comment->created, get_string('strftimedatetime', 'langconfig'));
 
-        return mod_studentquiz_send_notification('comment' . $event, $recipient, $actor, $data);
+        return mod_studentquiz_send_comment_notification('comment' . $event, $recipient, $actor, $data);
     }
 
     return false;
@@ -410,7 +429,7 @@ function mod_studentquiz_event_notification_comment($event, $comment, $course, $
 /**
  * Notify question author that an event occured when the autor has this capabilty
  * @param string $event The name of the event, used to automatically get capability and mail contents
- * @param stdClass comment that was just added to the question
+ * @param stdClass $comment that was just added to the question
  * @param stdClass $course course object
  * @param stdClass $module course module object
  * @return bool True if sucessfully sent, false otherwise.
@@ -430,7 +449,7 @@ function mod_studentquiz_event_notification_minecomment($event, $comment, $cours
         $data->commenttext = $comment->comment;
         $data->commenttime = userdate($comment->created, get_string('strftimedatetime', 'langconfig'));
 
-        return mod_studentquiz_send_notification('minecomment' . $event, $recipient, $actor, $data);
+        return mod_studentquiz_send_comment_notification('minecomment' . $event, $recipient, $actor, $data);
     }
 
     return false;
@@ -447,24 +466,66 @@ function mod_studentquiz_event_notification_minecomment($event, $comment, $cours
  * @return int|false as for {@link message_send()}.
  */
 function mod_studentquiz_send_notification($event, $recipient, $submitter, $data) {
-    global $CFG;
+    global $DB;
+    $customdata = [
+            'eventname' => $event,
+            'courseid' => $data->courseid,
+            'submitter' => $submitter,
+            'recipient' => $recipient,
+            'messagedata' => $data,
+            'questionurl' => $data->questionurl,
+            'questionname' => $data->questionname,
+    ];
+    if ($data->digesttype == 0) {
+        $task = new \mod_studentquiz\task\send_no_digest_notification_task();
+        $task->set_custom_data($customdata);
+        $task->set_component('mod_studentquiz');
+        \core\task\manager::queue_adhoc_task($task);
+    } else {
+        date_default_timezone_set('UTC');
+        $notificationqueue = new stdClass();
+        $notificationqueue->studentquizid = $data->moduleid;
+        $notificationqueue->content = serialize($customdata);
+        $notificationqueue->recipientid = $recipient->id;
+        if ($data->digesttype == 1) {
+            $notificationqueue->timetosend = strtotime(date('Y-m-d'));
+        } else {
+            $digestfirstday = $data->digestfirstday;
+            $notificationqueue->timetosend = \mod_studentquiz\utils::calculcate_notification_time_to_send($digestfirstday);
+        }
+        $DB->insert_record('studentquiz_notification', $notificationqueue);
+    }
+}
 
+/**
+ * Send notification for comment
+ *
+ * @todo Support this feature in {@link mod_studentquiz_send_notification} for the next release.
+ *
+ * @param string $event message event string
+ * @param stdClass $recipient user object of the intended recipient
+ * @param stdClass $submitter user object of the sender
+ * @param stdClass $data object of replaceable fields for the templates
+ *
+ * @return int|false as for {@link message_send()}.
+ */
+function mod_studentquiz_send_comment_notification($event, $recipient, $submitter, $data) {
     // Prepare the message.
     $eventdata = new \core\message\message();
-    $eventdata->component         = 'mod_studentquiz';
-    $eventdata->name              = $event;
-    $eventdata->notification      = 1;
-    $eventdata->courseid          = $data->courseid;
-    $eventdata->userfrom          = $submitter;
-    $eventdata->userto            = $recipient;
-    $eventdata->subject           = get_string('email' . $event . 'subject', 'studentquiz', $data);
-    $eventdata->smallmessage      = get_string('email' . $event . 'small', 'studentquiz', $data);
-    $eventdata->fullmessage       = get_string('email' . $event . 'body', 'studentquiz', $data);
+    $eventdata->component = 'mod_studentquiz';
+    $eventdata->name = $event;
+    $eventdata->notification = 1;
+    $eventdata->courseid = $data->courseid;
+    $eventdata->userfrom = $submitter;
+    $eventdata->userto = $recipient;
+    $eventdata->subject = get_string('email' . $event . 'subject', 'studentquiz', $data);
+    $eventdata->smallmessage = get_string('email' . $event . 'small', 'studentquiz', $data);
+    $eventdata->fullmessage = get_string('email' . $event . 'body', 'studentquiz', $data);
     $eventdata->fullmessageformat = FORMAT_PLAIN;
-    $eventdata->fullmessagehtml   = '';
+    $eventdata->fullmessagehtml = '';
 
-    $eventdata->contexturl        = $data->questionurl;
-    $eventdata->contexturlname    = $data->questionname;
+    $eventdata->contexturl = $data->questionurl;
+    $eventdata->contexturlname = $data->questionname;
 
     // ... and send it.
     return message_send($eventdata);
@@ -474,7 +535,7 @@ function mod_studentquiz_send_notification($event, $recipient, $submitter, $data
  * Generate an attempt with question usage
  * @param array $ids of question ids to be used in this attempt
  * @param stdClass $studentquiz generating this attempt
- * @param userid attempting this StudentQuiz
+ * @param int $userid attempting this StudentQuiz
  * @return stdClass attempt from generate quiz or false on error
  * TODO: Remove dependency on persistence from factory!
  */
@@ -513,14 +574,17 @@ function mod_studentquiz_generate_attempt($ids, $studentquiz, $userid) {
 }
 
 /**
- * @param $questionusage question_usage_by_activity
- * @param $studentquiz stdClass $studentquiz generating this attempt
- * @param $questionids array $ids of question ids to be used in this attempt
+ * Add question to attempt.
+ *
+ * @param stdClass $questionusage question_usage_by_activity
+ * @param stdClass $studentquiz generating this attempt
+ * @param array $questionids of question ids to be used in this attempt
+ * @param int $lastslot
  * @throws coding_exception
  */
-function mod_studentquiz_add_question_to_attempt(&$questionusage, $studentquiz, &$questionids, $lastslost = 0) {
+function mod_studentquiz_add_question_to_attempt(&$questionusage, $studentquiz, &$questionids, $lastslot = 0) {
     $allowedcategories = question_categorylist($studentquiz->categoryid);
-    $i = $lastslost;
+    $i = $lastslot;
     $addedquestions = 0;
     while ($addedquestions <= 0 && $i < count($questionids)) {
         $questiondata = question_bank::load_question($questionids[$i]);
@@ -615,6 +679,9 @@ function mod_studentquiz_reportrank_viewed($cmid, $context) {
 
 /**
  * Helper to get ids from prefexed ids in raw submit data
+ *
+ * @param array $rawdata from REQUEST
+ * @return array
  */
 function mod_studentquiz_helper_get_ids_by_raw_submit($rawdata) {
     if (!isset($rawdata)&& empty($rawdata)) {
@@ -675,7 +742,6 @@ function mod_studentquiz_get_user_ranking_table($cmid, $quantifiers, $excluderol
 /**
  * Get aggregated studentquiz data
  * @param int $cmid Course module id of the StudentQuiz considered.
- * @param stdClass $quantifiers ad-hoc class containing quantifiers for weighted points score.
  * @return moodle_recordset of paginated ranking table
  */
 function mod_studentquiz_community_stats($cmid) {
@@ -736,7 +802,9 @@ function mod_studentquiz_user_stats($cmid, $quantifiers, $userid) {
 }
 
 /**
- * @return
+ * Query helper for attempt stats
+ *
+ * @return string
  * TODO: Refactor: There must be a better way to do this!
  */
 function mod_studentquiz_helper_attempt_stat_select() {
@@ -799,6 +867,9 @@ function mod_studentquiz_helper_attempt_stat_select() {
 }
 
 /**
+ * Helper query for attempt stat joins
+ *
+ * @param array $excluderoles
  * @return string
  * TODO: Refactor: There must be a better way to do this!
  */
@@ -920,6 +991,11 @@ function mod_studentquiz_get_question_types() {
     return $returntypes;
 }
 
+/**
+ * Get key name of question types
+ *
+ * @return array
+ */
 function mod_studentquiz_get_question_types_keys() {
     $types = mod_studentquiz_get_question_types();
     return array_keys($types);
@@ -1014,179 +1090,6 @@ function mod_studentquiz_ensure_question_capabilities($context) {
 }
 
 /**
- * Migrate old StudentQuiz quiz usages to new data-logic.
- * Old Studentquiz created quiz instances for each "Run Quiz", while the new StudentQuiz uses the question-engine directly.
- * StudentQuiz <= 2.0.3 stored the quizzes in section 999 (and a import creates empty sections in between).
- * StudentQuiz <= 2.1.0 was not dependent on a section 999, but instead the teacher could choose in which section they are.
- *
- * This function must be usable for the restore and the plugin update process. In the restore we can get a courseid,
- * and a studentquizid. In the plugin update we have nothing, so all affected courses must be considered and checked.
- *
- * This task is basically the following:
- * MIGRATION.
- * - Find out if there is an orphaned section.
- * - For each studentquiz activity.
- * - Find all question-usages for each user in the quizzes matching the studentquiz name.
- * - Each question-usage must now be moved into a new studentquiz attempt table row.
- * CLEANUP.
- * - Find the last nonempty section not beeing the above orphaned section.
- * - Remove all sections with number bigger than the found one.
- *
- * Hint: To save time during these processes, the old quizzes are not yet removed, the cronjob has gotten this step
- *
- * @param int|null $courseorigid
- */
-function mod_studentquiz_migrate_old_quiz_usage($courseorigid=null) {
-    global $DB;
-
-    // If we haven't gotten a courseid, migration is meant to whole moodle instance.
-    $courseids = array();
-    if (!empty($courseorigid)) {
-        $courseids[] = $courseorigid;
-    } else {
-        $sql = "SELECT DISTINCT cm.course
-                  FROM {course_modules} cm
-            INNER JOIN {context} c ON cm.id = c.instanceid
-            INNER JOIN {question_categories} qc ON qc.contextid = c.id
-            INNER JOIN {modules} m ON cm.module = m.id
-                 WHERE m.name = :modulename";
-        $courseids = $DB->get_fieldset_sql($sql, array(
-            'modulename' => 'studentquiz'
-        ));
-    }
-
-    // Step into each course so they operate independent from each other.
-    foreach ($courseids as $courseid) {
-        // Import old core quiz data (question attempts) to studentquiz.
-        // This is the case, when orphaned section(s) can be found.
-        $sql = "SELECT id
-                  FROM {course_sections}
-                  WHERE course = :course
-                        AND name = :name";
-        $orphanedsectionids = $DB->get_fieldset_sql($sql, array(
-            'course' => $courseid,
-            'name' => STUDENTQUIZ_COURSE_SECTION_NAME
-        ));
-
-        if (!empty($orphanedsectionids)) {
-            $oldquizzes = array();
-
-            // For each course we need to find the studentquizzes.
-            // "up" section: Only get the topmost category of that studentquiz, which isn't "top" if that one exists.
-            $sql = "SELECT s.id, s.name, cm.id AS cmid, c.id AS contextid, qc.id AS categoryid, qc.name AS categoryname, qc.parent
-                      FROM {studentquiz} s
-                INNER JOIN {course_modules} cm ON s.id = cm.instance
-                INNER JOIN {context} c ON cm.id = c.instanceid
-                INNER JOIN {question_categories} qc ON qc.contextid = c.id
-                INNER JOIN {modules} m ON cm.module = m.id
-                 LEFT JOIN {question_categories} up ON qc.contextid = up.contextid
-                           AND qc.parent = up.id
-                     WHERE m.name = :modulename
-                           AND cm.course = :course
-                           AND (
-                                 up.name = :topname1
-                                 OR (
-                                      up.id IS NULL
-                                      AND qc.name <> :topname2
-                                    )
-                               )";
-            $studentquizzes = $DB->get_records_sql($sql, array(
-                'modulename' => 'studentquiz',
-                'course' => $courseid,
-                'topname1' => 'top',
-                'topname2' => 'top'
-            ));
-
-            foreach ($studentquizzes as $studentquiz) {
-
-                // Each studentquiz wants the question attempt id, which can be found inside the matching quizzes.
-                $sql = "SELECT qu.id AS qusageid, q.id AS quizid, cm.id AS cmid, cm.section AS sectionid, c.id AS contextid
-                         FROM {quiz} q
-                   INNER JOIN {course_modules} cm ON q.id = cm.instance
-                   INNER JOIN {context} c ON cm.id = c.instanceid
-                   INNER JOIN {modules} m ON cm.module = m.id
-                   INNER JOIN {question_usages} qu ON c.id = qu.contextid
-                        WHERE m.name = :modulename
-                              AND cm.course = :course
-                              AND " . $DB->sql_like('q.name', ':name', false);
-                $oldusages = $DB->get_records_sql($sql, array(
-                    'modulename' => 'quiz',
-                    'course' => $courseid,
-                    'name' => $studentquiz->name . '%'
-                ));
-
-                // For each old question usage we need to move it to studentquiz.
-                foreach ($oldusages as $oldusage) {
-                    $oldquizzes[$oldusage->quizid] = true;
-                    $DB->set_field('question_usages', 'component', 'mod_studentquiz',
-                        array('id' => $oldusage->qusageid));
-                    $DB->set_field('question_usages', 'contextid', $studentquiz->contextid,
-                        array('id' => $oldusage->qusageid));
-                    $DB->set_field('question_usages', 'preferredbehaviour', STUDENTQUIZ_DEFAULT_QUIZ_BEHAVIOUR,
-                        array('id' => $oldusage->qusageid));
-                    $DB->set_field('question_attempts', 'behaviour', STUDENTQUIZ_DEFAULT_QUIZ_BEHAVIOUR,
-                        array('questionusageid' => $oldusage->qusageid));
-
-                    // Now we need each user as own attempt.
-                    $sql = "SELECT DISTINCT qas.userid
-                              FROM {question_attempt_steps} qas
-                        INNER JOIN {question_attempts} qa ON qas.questionattemptid = qa.id
-                             WHERE qa.questionusageid = :qusageid";
-                    $userids = $DB->get_fieldset_sql($sql, array(
-                        'qusageid' => $oldusage->qusageid
-                    ));
-                    foreach ($userids as $userid) {
-                        $DB->insert_record('studentquiz_attempt', (object)array(
-                            'studentquizid' => $studentquiz->id,
-                            'userid' => $userid,
-                            'questionusageid' => $oldusage->qusageid,
-                            'categoryid' => $studentquiz->categoryid,
-                        ));
-                    }
-                }
-            }
-
-            // Cleanup quizzes as we have migrated the question usages now.
-            foreach (array_keys($oldquizzes) as $quizid) {
-                // So that quiz doesn't remove the question usages.
-                $DB->delete_records('quiz_attempts', array('quiz' => $quizid));
-            }
-
-            // So lookup the last non-empty section first.
-            $orphanedsectionids[] = 0; // Force multiple entries, so next command makes a IN statement in every case.
-            list($insql, $inparams) = $DB->get_in_or_equal($orphanedsectionids, SQL_PARAMS_NAMED, 'section');
-
-            $sql = "SELECT MAX(s.section) AS max_section
-                      FROM {course_sections} s
-                 LEFT JOIN {course_modules} m ON s.id = m.section
-                     WHERE s.course = :course
-                           AND s.id NOT " . $insql . "
-                           AND (
-                                 m.id IS NOT NULL
-                                 OR s.name <> :sectionname
-                                 OR s.summary <> :sectionsummary
-                               )";
-            $lastnonemptysection = $DB->get_record_sql($sql, array_merge($inparams, array(
-                'course' => $courseid,
-                'sectionname' => '',
-                'sectionsummary' => ''
-            )));
-
-            if ($lastnonemptysection !== false) {
-                // And remove all these useless sections.
-                $DB->delete_records_select('course_sections',
-                    'course = :course AND section > :nonemptysection',
-                    array(
-                        'course' => $courseid,
-                        'nonemptysection' => $lastnonemptysection->max_section
-                    )
-                );
-            }
-        }
-    }
-}
-
-/**
  * This is a helper to ensure we have a studentquiz_question record for a specific question
  *
  * @param int $id question id
@@ -1220,33 +1123,11 @@ function mod_studentquiz_ensure_studentquiz_question_record($id, $cmid, $honorpu
 }
 
 /**
- * @param $ids
- * @return array [questionid] -> array ( array($tagname, $tagrawname) )
+ * Count questions in a coursemodule
+ *
+ * @param int $cmid
+ * @return int
  */
-function mod_studentquiz_get_tags_by_question_ids($ids) {
-    global $DB;
-
-    // Return an empty array for empty selection.
-    if (empty($ids)) {
-        return array();
-    }
-
-    list($insql, $params) = $DB->get_in_or_equal($ids);
-    $result = array();
-    $sql = "SELECT ti.id AS id, t.id AS tagid, t.name, t.rawname, ti.itemid
-              FROM {tag} t
-              JOIN {tag_instance} ti ON ti.tagid = t.id
-             WHERE ti.itemtype = 'question' AND ti.itemid " . $insql;
-    $tags = $DB->get_records_sql($sql, $params);
-    foreach ($tags as $tag) {
-        if (empty($result[$tag->itemid])) {
-            $result[$tag->itemid] = array();
-        }
-        $result[$tag->itemid][] = $tag;
-    }
-    return $result;
-}
-
 function mod_studentquiz_count_questions($cmid) {
     global $DB;
     $sql = "SELECT COUNT(*)
@@ -1266,7 +1147,7 @@ function mod_studentquiz_count_questions($cmid) {
 /**
  * This query collects aggregated information about the questions in this StudentQuiz.
  *
- * @param $cmid
+ * @param int $cmid
  * @throws dml_exception
  */
 function mod_studentquiz_question_stats($cmid) {
@@ -1297,59 +1178,6 @@ function mod_studentquiz_question_stats($cmid) {
                    AND sq.coursemodule = :cmid1";
     $rs = $DB->get_record_sql($sql, array('cmid1' => $cmid, 'cmid2' => $cmid));
     return $rs;
-}
-
-/**
- * Fix parent of question categories of StudentQuiz.
- * Old StudentQuiz had the parent of question categories not equalling to 0 for various reasons, but they should.
- * In Moodle < 3.5 there is no "top" parent category, so the question category itself has to be corrected if it's not 0.
- * In Moodle >= 3.5 there is a new "top" parent category, so the question category of StudentQuiz has to have that as parent.
- * See https://tracker.moodle.org/browse/MDL-61132 and its diff.
- *
- * This function must be usable for the restore and the plugin update process.
- */
-function mod_studentquiz_fix_wrong_parent_in_question_categories() {
-    global $DB;
-
-    if (function_exists('question_get_top_category')) { // We have a moodle with "top" category feature.
-        $sql = "SELECT qc.id, qc.contextid, qc.name, qc.parent
-                  FROM {question_categories} qc
-            INNER JOIN {context} c ON qc.contextid = c.id
-            INNER JOIN {course_modules} cm ON c.instanceid = cm.id
-            INNER JOIN {modules} m ON cm.module = m.id
-             LEFT JOIN {question_categories} up ON qc.contextid = up.contextid
-                       AND qc.parent = up.id
-                 WHERE m.name = :modulename
-                       AND up.name IS NULL
-                       AND qc.name <> :topname";
-        $categorieswithouttop = $DB->get_records_sql($sql, array(
-            'modulename' => 'studentquiz',
-            'topname' => 'top'
-        ));
-        foreach ($categorieswithouttop as $currentcat) {
-            $topcat = question_get_top_category($currentcat->contextid, true);
-            // Now set the parent to the newly created top id.
-            $DB->set_field('question_categories', 'parent', $topcat->id, array('id' => $currentcat->id));
-        }
-    } else {
-        $sql = "SELECT qc.id, qc.contextid, qc.name, qc.parent
-                  FROM {question_categories} qc
-            INNER JOIN {context} c ON qc.contextid = c.id
-            INNER JOIN {course_modules} cm ON c.instanceid = cm.id
-            INNER JOIN {modules} m ON cm.module = m.id
-             LEFT JOIN {question_categories} up ON qc.contextid = up.contextid
-                       AND qc.parent = up.id
-                 WHERE m.name = :modulename
-                       AND up.id IS NULL
-                       AND qc.parent <> 0";
-        $categorieswithoutparent = $DB->get_records_sql($sql, array(
-                'modulename' => 'studentquiz'
-        ));
-        foreach ($categorieswithoutparent as $currentcat) {
-            // Now set the parent to 0.
-            $DB->set_field('question_categories', 'parent', 0, array('id' => $currentcat->id));
-        }
-    }
 }
 
 /**
@@ -1384,19 +1212,17 @@ function mod_studentquiz_check_availability($openform, $closefrom, $type) {
 /**
  * Saves question rating.
  *
- * // TODO:
- * @param  stdClass $data requires userid, questionid, rate
- * @internal param $course
- * @internal param $module
+ * @param stdClass $data requires userid, questionid, rate
  */
 function mod_studentquiz_save_rate($data) {
-    global $DB, $USER;
+    global $DB;
 
-    $row = $DB->get_record('studentquiz_rate', array('userid' => $USER->id, 'questionid' => $data->questionid));
+    $row = $DB->get_record('studentquiz_rate', array('userid' => $data->userid, 'questionid' => $data->questionid));
     if ($row === false) {
         $DB->insert_record('studentquiz_rate', $data);
     } else {
-        $DB->update_record('studentquiz_rate', $row);
+        $data->id = $row->id;
+        $DB->update_record('studentquiz_rate', $data);
     }
 }
 
@@ -1409,10 +1235,8 @@ function mod_studentquiz_save_rate($data) {
  * @throws dml_exception
  */
 function mod_studentquiz_compare_questions_data($studentquiz, $honorpublish = true, $hidden = true) {
-    global $DB, $CFG;
-    if ($CFG->branch >= 37) {
-        return;
-    }
+    global $DB;
+
     $sql = "SELECT q.id
               FROM {studentquiz} sq
               JOIN {context} con ON con.instanceid = sq.coursemodule
@@ -1459,8 +1283,8 @@ function mod_studentquiz_fix_all_missing_question_state_after_restore($courseori
     if (!empty($courseorigid)) {
         $params['course'] = $courseorigid;
     }
-    $studentquizes = $DB->get_records('studentquiz', $params);
 
+    $studentquizes = $DB->get_records('studentquiz', $params);
     $transaction = $DB->start_delegated_transaction();
 
     try {

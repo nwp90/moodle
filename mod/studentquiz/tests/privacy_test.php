@@ -18,6 +18,7 @@
  * Data provider tests for booking system module.
  *
  * @package    mod_studentquiz
+ * @copyright  2018 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -26,10 +27,12 @@ defined('MOODLE_INTERNAL') || die();
 global $CFG;
 
 use core_privacy\local\request\transform;
+use core_privacy\local\request\userlist;
 use core_privacy\tests\provider_testcase;
 use mod_studentquiz\privacy\provider;
 use core_privacy\local\request\approved_contextlist;
 use core_privacy\local\request\writer;
+use mod_studentquiz\utils;
 
 /**
  * Data provider testcase class.
@@ -82,12 +85,17 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
     /**
      * @var array
      */
-    protected $practices;
+    protected $progresses;
 
     /**
      * @var array
      */
-    protected $progresses;
+    protected $commenthistory;
+
+    /**
+     * @var array
+     */
+    protected $notifications;
 
     /**
      * @var array
@@ -176,7 +184,7 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 self::create_comment($this->questions[0]->id, $this->users[1]->id),
                 self::create_comment($this->questions[1]->id, $this->users[1]->id),
                 self::create_comment($this->questions[2]->id, $this->users[1]->id),
-                self::create_comment($this->questions[3]->id, $this->users[0]->id),
+                self::create_comment($this->questions[3]->id, $this->users[0]->id, 0, 0, 0, 1 , $this->users[0]->id),
         ];
 
         // Create 2 replies for second user.
@@ -191,16 +199,21 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
         $this->comments[] = self::create_comment($rootcomment->questionid, $userreply->id, $rootcomment->id);
         $this->comments[] = self::create_comment($rootcomment->questionid, $userreply->id, $rootcomment->id);
 
+        // Create comment histories.
+        $this->commenthistory = [
+                self::create_comment_history($this->comments[0]->id, $this->users[1]->id, false),
+                self::create_comment_history($this->comments[1]->id, $this->users[1]->id, false),
+                self::create_comment_history($this->comments[2]->id, $this->users[1]->id, false),
+                self::create_comment_history($this->comments[3]->id, $this->users[0]->id, true)
+        ];
+
         // Create Progresses.
-        // Skipped for now. Reasons:
-        // (1) mysqli_native_moodle_database.php:1331 doesn't like php 7.2
-        // (2) this table is currently not used
-        /*$this->progresses = [
+        $this->progresses = [
                 self::create_progress($this->questions[0]->id, $this->users[0]->id, $this->studentquiz[0]->id),
                 self::create_progress($this->questions[1]->id, $this->users[0]->id, $this->studentquiz[0]->id),
                 self::create_progress($this->questions[2]->id, $this->users[0]->id, $this->studentquiz[1]->id),
                 self::create_progress($this->questions[3]->id, $this->users[1]->id, $this->studentquiz[1]->id),
-        ];*/
+        ];
 
         // Create attempts.
         $this->attempts = [
@@ -210,11 +223,12 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 self::create_attempt($this->studentquiz[1]->id, $this->users[1]->id, $this->studentquiz[1]->categoryid),
         ];
 
-        // Create practices.
-        $this->practices = [
-                self::create_practice($this->studentquiz[0]->coursemodule, $this->users[0]->id),
-                self::create_practice($this->studentquiz[1]->coursemodule, $this->users[0]->id),
-                self::create_practice($this->studentquiz[1]->coursemodule, $this->users[1]->id),
+        // Create attempts.
+        $this->notifications = [
+                self::create_notification($this->studentquiz[0]->id, $this->users[0]->id),
+                self::create_notification($this->studentquiz[0]->id, $this->users[0]->id),
+                self::create_notification($this->studentquiz[1]->id, $this->users[0]->id),
+                self::create_notification($this->studentquiz[1]->id, $this->users[1]->id),
         ];
 
         $this->subcontext = [get_string('pluginname', 'mod_studentquiz')];
@@ -266,10 +280,6 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 'approved' => transform::yesno($this->approvals[1]->state)
         ], $questions[$this->questions[1]->id]);
 
-        /*
-        // Skipped for now. Reasons:
-        // (1) mysqli_native_moodle_database.php:1331 doesn't like php 7.2
-        // (2) this table is currently not used
         $progresses = $data->progresses;
         $this->assertCount(2, $progresses);
         $this->assertEquals((object) [
@@ -285,15 +295,7 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 'lastanswercorrect' => transform::yesno($this->progresses[1]->lastanswercorrect),
                 'attempts' => $this->progresses[1]->attempts,
                 'correctattempts' => $this->progresses[1]->correctattempts
-        ], $progresses[$this->progresses[1]->questionid]);*/
-
-        $practices = $data->practices;
-        $this->assertCount(1, $practices);
-        $this->assertEquals((object) [
-                'quizcoursemodule' => $this->practices[0]->quizcoursemodule,
-                'studentquizcoursemodule' => $this->practices[0]->studentquizcoursemodule,
-                'userid' => transform::user($this->practices[0]->userid),
-        ], $practices[$this->practices[0]->id]);
+        ], $progresses[$this->progresses[1]->questionid]);
 
         $attempts = $data->attempts;
         $this->assertCount(2, $attempts);
@@ -340,14 +342,12 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 'userid' => transform::user($this->comments[3]->userid),
                 'created' => transform::datetime($this->comments[3]->created),
                 'parentid' => $this->comments[3]->parentid,
-                'deleted' => $this->comments[3]->deleted > 0 ? transform::datetime($this->comments[3]->deleted) : 0,
-                'deleteuserid' => !is_null($this->comments[3]->deleteuserid) ? transform::user($this->comments[3]->deleteuserid) : null
+                'status' => !is_null($this->comments[3]->status) ? $this->comments[3]->status : 0,
+                'timemodified' => $this->comments[3]->timemodified > 0 ? transform::datetime($this->comments[3]->timemodified) : 0,
+                'usermodified' => !is_null($this->comments[3]->usermodified) ? transform::user($this->comments[3]->usermodified) :
+                        null
         ], $comments[$this->comments[3]->id]);
 
-        // Skipped for now. Reasons:
-        // (1) mysqli_native_moodle_database.php:1331 doesn't like php 7.2
-        // (2) this table is currently not used
-        /*
         $progresses = $data->progresses;
         $this->assertCount(1, $progresses);
         $this->assertEquals((object) [
@@ -356,15 +356,7 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 'lastanswercorrect' => transform::yesno($this->progresses[2]->lastanswercorrect),
                 'attempts' => $this->progresses[2]->attempts,
                 'correctattempts' => $this->progresses[2]->correctattempts
-        ], $progresses[$this->progresses[2]->questionid]);*/
-
-        $practices = $data->practices;
-        $this->assertCount(1, $practices);
-        $this->assertEquals((object) [
-                'quizcoursemodule' => $this->practices[1]->quizcoursemodule,
-                'studentquizcoursemodule' => $this->practices[1]->studentquizcoursemodule,
-                'userid' => transform::user($this->practices[1]->userid),
-        ], $practices[$this->practices[1]->id]);
+        ], $progresses[$this->progresses[2]->questionid]);
 
         $attempts = $data->attempts;
         $this->assertCount(1, $attempts);
@@ -374,6 +366,11 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 'questionusageid' => $this->attempts[2]->questionusageid,
                 'categoryid' => $this->attempts[2]->categoryid,
         ], $attempts[$this->attempts[2]->id]);
+
+        $commenthistory = $data->commenthistory;
+        $this->assertCount(1, $commenthistory);
+        $this->assertEquals($this->comments[3]->id, current($commenthistory)->commentid);
+        $this->assertEquals($this->users[0]->id, current($commenthistory)->userid);
     }
 
     /**
@@ -410,8 +407,10 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 'userid' => transform::user($this->comments[0]->userid),
                 'created' => transform::datetime($this->comments[0]->created),
                 'parentid' => $this->comments[0]->parentid,
-                'deleted' => $this->comments[0]->deleted > 0 ? transform::datetime($this->comments[0]->deleted) : 0,
-                'deleteuserid' => !is_null($this->comments[0]->deleteuserid) ? transform::user($this->comments[0]->deleteuserid) : null
+                'status' => !is_null($this->comments[0]->status) ? $this->comments[0]->status : 0,
+                'timemodified' => $this->comments[0]->timemodified > 0 ? transform::datetime($this->comments[0]->timemodified) : 0,
+                'usermodified' => !is_null($this->comments[0]->usermodified) ? transform::user($this->comments[0]->usermodified) :
+                        null
         ], $comments[$this->comments[0]->id]);
         $this->assertEquals((object) [
                 'comment' => $this->comments[1]->comment,
@@ -419,17 +418,25 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 'userid' => transform::user($this->comments[1]->userid),
                 'created' => transform::datetime($this->comments[1]->created),
                 'parentid' => $this->comments[1]->parentid,
-                'deleted' => $this->comments[1]->deleted > 0 ? transform::datetime($this->comments[1]->deleted) : 0,
-                'deleteuserid' => !is_null($this->comments[1]->deleteuserid) ? transform::user($this->comments[1]->deleteuserid) : null
+                'status' => !is_null($this->comments[1]->status) ? $this->comments[1]->status : 0,
+                'timemodified' => $this->comments[1]->timemodified > 0 ? transform::datetime($this->comments[1]->timemodified) : 0,
+                'usermodified' => !is_null($this->comments[1]->usermodified) ? transform::user($this->comments[1]->usermodified) :
+                        null
         ], $comments[$this->comments[1]->id]);
 
         $this->assertEmpty($data->questions);
 
-        // Skipped for now. Reasons:
-        // (1) mysqli_native_moodle_database.php:1331 doesn't like php 7.2
-        // (2) this table is currently not used
-        // $this->assertEmpty($data->progresses);
-        $this->assertEmpty($data->practices);
+        $commenthistory = $data->commenthistory;
+        $this->assertCount(2, $commenthistory);
+        $this->assertEquals((object) [
+                'commentid' => $this->comments[1]->id,
+                'content' => $this->commenthistory[1]->content,
+                'userid' => !is_null($this->comments[1]->usermodified) ? transform::user($this->comments[1]->usermodified) : null,
+                'action' => utils::COMMENT_HISTORY_CREATE,
+                'timemodified' => transform::datetime($this->commenthistory[1]->timemodified)
+        ], $commenthistory[$this->commenthistory[1]->id]);
+
+        $this->assertEmpty($data->progresses);
         $this->assertEmpty($data->attempts);
 
         $contextdata = writer::with_context($this->contexts[1]);
@@ -459,8 +466,10 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 'userid' => transform::user($this->comments[2]->userid),
                 'created' => transform::datetime($this->comments[2]->created),
                 'parentid' => $this->comments[2]->parentid,
-                'deleted' => $this->comments[2]->deleted > 0 ? transform::datetime($this->comments[2]->deleted) : 0,
-                'deleteuserid' => !is_null($this->comments[2]->deleteuserid) ? transform::user($this->comments[2]->deleteuserid) : null
+                'status' => !is_null($this->comments[2]->status) ? $this->comments[2]->status : 0,
+                'timemodified' => $this->comments[2]->timemodified > 0 ? transform::datetime($this->comments[2]->timemodified) : 0,
+                'usermodified' => !is_null($this->comments[2]->usermodified) ? transform::user($this->comments[2]->usermodified) :
+                        null
         ], $comments[$this->comments[2]->id]);
 
         // Test replies.
@@ -471,8 +480,10 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 'userid' => transform::user($this->comments[4]->userid),
                 'created' => transform::datetime($this->comments[4]->created),
                 'parentid' => $this->comments[3]->id,
-                'deleted' => $this->comments[4]->deleted > 0 ? transform::datetime($this->comments[4]->deleted) : 0,
-                'deleteuserid' => !is_null($this->comments[4]->deleteuserid) ? transform::user($this->comments[4]->deleteuserid) : null
+                'status' => !is_null($this->comments[4]->status) ? $this->comments[4]->status : 0,
+                'timemodified' => $this->comments[4]->timemodified > 0 ? transform::datetime($this->comments[4]->timemodified) : 0,
+                'usermodified' => !is_null($this->comments[4]->usermodified) ? transform::user($this->comments[4]->usermodified) :
+                        null
         ], $comments[$this->comments[4]->id]);
 
         // Test reply 2.
@@ -482,17 +493,11 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 'userid' => transform::user($this->comments[5]->userid),
                 'created' => transform::datetime($this->comments[5]->created),
                 'parentid' => $this->comments[3]->id,
-                'deleted' => $this->comments[5]->deleted > 0 ? transform::datetime($this->comments[5]->deleted) : 0,
-                'deleteuserid' => !is_null($this->comments[5]->deleteuserid) ? transform::user($this->comments[5]->deleteuserid) : null
+                'status' => !is_null($this->comments[5]->status) ? $this->comments[5]->status : 0,
+                'timemodified' => $this->comments[5]->timemodified > 0 ? transform::datetime($this->comments[5]->timemodified) : 0,
+                'usermodified' => !is_null($this->comments[5]->usermodified) ? transform::user($this->comments[5]->usermodified) :
+                        null
         ], $comments[$this->comments[5]->id]);
-
-        $practices = $data->practices;
-        $this->assertCount(1, $practices);
-        $this->assertEquals((object) [
-                'quizcoursemodule' => $this->practices[2]->quizcoursemodule,
-                'studentquizcoursemodule' => $this->practices[2]->studentquizcoursemodule,
-                'userid' => transform::user($this->practices[2]->userid),
-        ], $practices[$this->practices[2]->id]);
 
         $attempts = $data->attempts;
         $this->assertCount(1, $attempts);
@@ -526,17 +531,13 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 , $questionparams));
         $this->assertFalse($DB->record_exists_sql("SELECT 1 FROM {studentquiz_comment} WHERE questionid {$questionsql}"
                 , $questionparams));
-        /* Skipped for now. Reasons:
-         * (1) mysqli_native_moodle_database.php:1331 doesn't like php 7.2
-         * (2) this table is currently not used
-         * $this->assertFalse($DB->record_exists_sql("SELECT 1 FROM {studentquiz_progress} WHERE questionid {$questionsql}"
-         *        , $questionparams));
-         */
+        $this->assertFalse($DB->record_exists_sql("SELECT 1 FROM {studentquiz_progress} WHERE questionid {$questionsql}"
+                , $questionparams));
         $this->assertFalse($DB->record_exists_sql("SELECT 1 FROM {question} WHERE id {$questionsql}", $questionparams));
-        $this->assertFalse($DB->record_exists_sql("SELECT 1 FROM {studentquiz_practice} WHERE studentquizcoursemodule = :cmid", [
-                'cmid' => $this->studentquiz[0]->coursemodule
-        ]));
         $this->assertFalse($DB->record_exists_sql("SELECT 1 FROM {studentquiz_attempt} WHERE studentquizid = :studentquizid", [
+                'studentquizid' => $this->studentquiz[0]->id
+        ]));
+        $this->assertFalse($DB->record_exists_sql("SELECT 1 FROM {studentquiz_notification} WHERE studentquizid = :studentquizid", [
                 'studentquizid' => $this->studentquiz[0]->id
         ]));
 
@@ -549,17 +550,15 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 , $questionparams));
         $this->assertTrue($DB->record_exists_sql("SELECT 1 FROM {studentquiz_comment} WHERE questionid {$questionsql}"
                 , $questionparams));
-        /* Skipped for now. Reasons:
-         * (1) mysqli_native_moodle_database.php:1331 doesn't like php 7.2
-         * (2) this table is currently not used
-         * $this->assertFalse($DB->record_exists_sql("SELECT 1 FROM {studentquiz_progress} WHERE questionid {$questionsql}"
-         *        , $questionparams));
-         */
+        $this->assertTrue($DB->record_exists_sql("SELECT 1 FROM {studentquiz_comment_history} WHERE userid = :userid"
+                , ['userid' => $this->users[0]->id]));
+        $this->assertTrue($DB->record_exists_sql("SELECT 1 FROM {studentquiz_progress} WHERE questionid {$questionsql}"
+                , $questionparams));
         $this->assertTrue($DB->record_exists_sql("SELECT 1 FROM {question} WHERE id {$questionsql}", $questionparams));
-        $this->assertTrue($DB->record_exists_sql("SELECT 1 FROM {studentquiz_practice} WHERE studentquizcoursemodule = :cmid", [
-                'cmid' => $this->studentquiz[1]->coursemodule
-        ]));
         $this->assertTrue($DB->record_exists_sql("SELECT 1 FROM {studentquiz_attempt} WHERE studentquizid = :studentquizid", [
+                'studentquizid' => $this->studentquiz[1]->id
+        ]));
+        $this->assertTrue($DB->record_exists_sql("SELECT 1 FROM {studentquiz_notification} WHERE studentquizid = :studentquizid", [
                 'studentquizid' => $this->studentquiz[1]->id
         ]));
     }
@@ -601,7 +600,6 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
         // Check personal data of other tables are deleted.
         $params = ['userid' => $this->users[0]->id];
 
-        $this->assertFalse($DB->record_exists('studentquiz_practice', $params));
         $this->assertFalse($DB->record_exists('studentquiz_rate', $params));
         $this->assertFalse($DB->record_exists('studentquiz_attempt', $params));
 
@@ -609,31 +607,31 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
         $sql = "SELECT 1 FROM {studentquiz_comment} WHERE userid = :userid AND parentid != :parentid";
         $this->assertFalse($DB->record_exists_sql($sql, $commentparams));
 
+        // Deleted all comment history.
+        $sql = "SELECT 1 FROM {studentquiz_comment_history} WHERE userid = :userid";
+        $this->assertFalse($DB->record_exists_sql($sql, $commentparams));
+
+        // Deleted all notifications.
+        $this->assertFalse($DB->record_exists('studentquiz_notification', ['recipientid' => $this->users[0]->id]));
+
         // Test root comment became blank.
         $commentafterdelete = $DB->get_record('studentquiz_comment', ['id' => $rootcomment->id]);
         $this->assertEquals($rootcomment->id, $commentafterdelete->id);
         $this->assertEquals('', $commentafterdelete->comment);
         $this->assertEquals($guestid, $commentafterdelete->userid);
-        $this->assertEquals($guestid, $commentafterdelete->deleteuserid);
-        $this->assertTrue($commentafterdelete->deleted != 0);
+        $this->assertEquals($guestid, $commentafterdelete->usermodified);
+        $this->assertEquals(utils::COMMENT_HISTORY_CREATE, $commentafterdelete->status);
+        $this->assertTrue($commentafterdelete->timemodified != 0);
+        $this->assertFalse($DB->record_exists('studentquiz_progress', $params));
 
-        // Skipped for now. Reasons:
-        // (1) mysqli_native_moodle_database.php:1331 doesn't like php 7.2
-        // (2) this table is currently not used
-
-        // $this->assertFalse($DB->record_exists('studentquiz_progress', $params));
         // Check personal data belong to second user still existed.
         $params = ['userid' => $this->users[1]->id];
         $this->assertEquals($this->users[1]->id, $questions[$this->questions[3]->id]->createdby);
         $this->assertEquals($this->users[1]->id, $questions[$this->questions[3]->id]->modifiedby);
-        $this->assertTrue($DB->record_exists('studentquiz_practice', $params));
         $this->assertTrue($DB->record_exists('studentquiz_rate', $params));
         $this->assertTrue($DB->record_exists('studentquiz_attempt', $params));
         $this->assertTrue($DB->record_exists('studentquiz_comment', $params));
-        // Skipped for now. Reasons:
-        // (1) mysqli_native_moodle_database.php:1331 doesn't like php 7.2
-        // (2) this table is currently not used
-        // $this->assertTrue($DB->record_exists('studentquiz_progress', $params));
+        $this->assertTrue($DB->record_exists('studentquiz_progress', $params));
     }
 
     /**
@@ -647,8 +645,8 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
         self::create_question('Question', 'truefalse', $this->studentquiz[2]->categoryid,
                 $this->users[0]);
 
-        $userlist = new \core_privacy\local\request\userlist($this->contexts[2], $this->component);
-        \mod_studentquiz\privacy\provider::get_users_in_context($userlist);
+        $userlist = new userlist($this->contexts[2], $this->component);
+        provider::get_users_in_context($userlist);
 
         $this->assertCount(1, $userlist);
         $this->assertEquals([$this->users[0]->id], $userlist->get_userids());
@@ -656,7 +654,7 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
         // Create question for second user, check two users return for this context.
         self::create_question('Question', 'truefalse', $this->studentquiz[2]->categoryid,
                 $this->users[1]);
-        \mod_studentquiz\privacy\provider::get_users_in_context($userlist);
+        provider::get_users_in_context($userlist);
 
         $this->assertCount(2, $userlist);
         $this->assertEquals([$this->users[0]->id, $this->users[1]->id], $userlist->get_userids());
@@ -675,15 +673,15 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
         $question = self::create_question('Question', 'truefalse', $this->studentquiz[2]->categoryid, $anotheruser);
         $this->create_rate($question->id, $this->users[0]->id);
 
-        $userlist = new \core_privacy\local\request\userlist($this->contexts[2], $this->component);
-        \mod_studentquiz\privacy\provider::get_users_in_context($userlist);
+        $userlist = new userlist($this->contexts[2], $this->component);
+        provider::get_users_in_context($userlist);
 
         $this->assertCount(2, $userlist);
         $this->assertEquals([$anotheruser->id, $this->users[0]->id], $userlist->get_userids());
 
         // Second student rate on another user question.
         $this->create_rate($question->id, $this->users[1]->id);
-        \mod_studentquiz\privacy\provider::get_users_in_context($userlist);
+        provider::get_users_in_context($userlist);
         $this->assertCount(3, $userlist);
         $this->assertEquals([$anotheruser->id, $this->users[0]->id, $this->users[1]->id ], $userlist->get_userids());
     }
@@ -701,39 +699,38 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
         $question = self::create_question('Question', 'truefalse', $this->studentquiz[2]->categoryid, $anotheruser);
         $this->create_comment($question->id, $this->users[0]->id);
 
-        $userlist = new \core_privacy\local\request\userlist($this->contexts[2], $this->component);
-        \mod_studentquiz\privacy\provider::get_users_in_context($userlist);
+        $userlist = new userlist($this->contexts[2], $this->component);
+        provider::get_users_in_context($userlist);
 
         $this->assertCount(2, $userlist);
         $this->assertEquals([$anotheruser->id, $this->users[0]->id], $userlist->get_userids());
 
         // Second student comment on another user question.
         $this->create_comment($question->id, $this->users[1]->id);
-        \mod_studentquiz\privacy\provider::get_users_in_context($userlist);
+        provider::get_users_in_context($userlist);
         $this->assertCount(3, $userlist);
         $this->assertEquals([$anotheruser->id, $this->users[0]->id, $this->users[1]->id ], $userlist->get_userids());
     }
 
     /**
-     * Test get users in context with practice condition.
+     * Test get users in context with question's comment condition.
      *
+     * @throws coding_exception
      * @throws dml_exception
      */
-    public function test_get_users_in_context_practice() {
-        // Create practice for the first user.
-        $this->create_practice($this->studentquiz[2]->coursemodule, $this->users[0]->id);
+    public function test_get_users_in_context_comment_history() {
+        // Another user create question, then first user comment it.
+        $anotheruser = $this->getDataGenerator()->create_user();
 
-        $userlist = new \core_privacy\local\request\userlist($this->contexts[2], $this->component);
-        \mod_studentquiz\privacy\provider::get_users_in_context($userlist);
+        $question = self::create_question('Question', 'truefalse', $this->studentquiz[2]->categoryid, $anotheruser);
+        $comment = $this->create_comment($question->id, $this->users[0]->id);
+        $this->create_comment_history($comment->id, $this->users[0]->id);
 
-        $this->assertCount(1, $userlist);
-        $this->assertEquals([$this->users[0]->id], $userlist->get_userids());
+        $userlist = new userlist($this->contexts[2], $this->component);
+        provider::get_users_in_context($userlist);
 
-        // Create practice for the second user.
-        $this->create_practice($this->studentquiz[2]->coursemodule, $this->users[1]->id);
-        mod_studentquiz\privacy\provider::get_users_in_context($userlist);
         $this->assertCount(2, $userlist);
-        $this->assertEquals([$this->users[0]->id, $this->users[1]->id ], $userlist->get_userids());
+        $this->assertEquals([$anotheruser->id, $this->users[0]->id], $userlist->get_userids());
     }
 
     /**
@@ -742,18 +739,40 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
      * @throws dml_exception
      */
     public function test_get_users_in_context_attempt() {
-        // Create attempt for the first user
+        // Create attempt for the first user.
         $this->create_attempt($this->studentquiz[2]->id, $this->users[0]->id, $this->studentquiz[2]->categoryid);
 
-        $userlist = new \core_privacy\local\request\userlist($this->contexts[2], $this->component);
-        \mod_studentquiz\privacy\provider::get_users_in_context($userlist);
+        $userlist = new userlist($this->contexts[2], $this->component);
+        provider::get_users_in_context($userlist);
 
         $this->assertCount(1, $userlist);
         $this->assertEquals([$this->users[0]->id], $userlist->get_userids());
 
         // Create attempt for the second student.
         $this->create_attempt($this->studentquiz[2]->id, $this->users[1]->id, $this->studentquiz[2]->categoryid);
-        \mod_studentquiz\privacy\provider::get_users_in_context($userlist);
+        provider::get_users_in_context($userlist);
+        $this->assertCount(2, $userlist);
+        $this->assertEquals([$this->users[0]->id, $this->users[1]->id], $userlist->get_userids());
+    }
+
+    /**
+     * Test get users in context with question's notification condition.
+     *
+     * @throws dml_exception
+     */
+    public function test_get_users_in_context_notification() {
+        // Create attempt for the first user.
+        $this->create_notification($this->studentquiz[2]->id, $this->users[0]->id);
+
+        $userlist = new userlist($this->contexts[2], $this->component);
+        provider::get_users_in_context($userlist);
+
+        $this->assertCount(1, $userlist);
+        $this->assertEquals([$this->users[0]->id], $userlist->get_userids());
+
+        // Create attempt for the second student.
+        $this->create_notification($this->studentquiz[2]->id, $this->users[1]->id);
+        provider::get_users_in_context($userlist);
         $this->assertCount(2, $userlist);
         $this->assertEquals([$this->users[0]->id, $this->users[1]->id], $userlist->get_userids());
     }
@@ -773,7 +792,7 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
             $this->users[0]->id
         ]);
 
-        \mod_studentquiz\privacy\provider::delete_data_for_users($approveduserlist);
+        provider::delete_data_for_users($approveduserlist);
 
         // Check question owner of deleting user is change to guest.
         $questions = $DB->get_records('question');
@@ -789,10 +808,6 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
         // Check personal data of other tables are deleted for first user and first context.
         $sqlparams = ['userid' => $this->users[0]->id];
 
-        $practices = $DB->get_records('studentquiz_practice', $sqlparams);
-        $this->assertCount(1, $practices);
-        $this->assertArrayHasKey($this->practices[1]->id, $practices);
-
         $rates = $DB->get_records('studentquiz_rate', $sqlparams);
         $this->assertCount(1, $rates);
         $this->assertArrayHasKey($this->rates[3]->id, $rates);
@@ -805,23 +820,30 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
         $this->assertCount(3, $comments);
         $this->assertArrayHasKey($this->comments[3]->id, $comments);
 
+        $commenthistory = $DB->get_records('studentquiz_comment_history', $sqlparams);
+        $this->assertCount(0, $commenthistory);
+
+        $notifications = $DB->get_records('studentquiz_notification', ['recipientid' => $this->users[0]->id]);
+        $this->assertCount(0, $notifications);
+
         // Test data belong to the second user still exist.
         $sqlparams = ['userid' => $this->users[1]->id];
         $this->assertEquals($this->users[1]->id, $questions[$this->questions[3]->id]->createdby);
         $this->assertEquals($this->users[1]->id, $questions[$this->questions[3]->id]->modifiedby);
-        $this->assertTrue($DB->record_exists('studentquiz_practice', $sqlparams));
         $this->assertTrue($DB->record_exists('studentquiz_rate', $sqlparams));
         $this->assertTrue($DB->record_exists('studentquiz_attempt', $sqlparams));
         $this->assertTrue($DB->record_exists('studentquiz_comment', $sqlparams));
+        $this->assertTrue($DB->record_exists('studentquiz_comment_history', $sqlparams));
+        $this->assertTrue($DB->record_exists('studentquiz_notification', ['recipientid' => $this->users[1]->id]));
     }
 
     /**
      * Create question for user.
      *
-     * @param $name
-     * @param $qtype
-     * @param $categoryid
-     * @param $user
+     * @param string $name
+     * @param string $qtype
+     * @param int $categoryid
+     * @param stdClass $user
      * @return question_definition
      * @throws coding_exception
      */
@@ -846,7 +868,7 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
     /**
      * Create approval data for question.
      *
-     * @param $questionid
+     * @param int $questionid
      * @return object
      * @throws dml_exception
      */
@@ -867,8 +889,8 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
     /**
      * Create rate data for user.
      *
-     * @param $questionid
-     * @param $userid
+     * @param int $questionid
+     * @param int $userid
      * @return object
      * @throws dml_exception
      */
@@ -890,15 +912,18 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
     /**
      * Create comment data for user.
      *
-     * @param $questionid
-     * @param $userid
-     * @param $parentid
-     * @param $delete
-     * @param $deleteuserid
+     * @param int $questionid
+     * @param int $userid
+     * @param int $parentid
+     * @param int $delete
+     * @param int $deleteuserid
+     * @param int $edit
+     * @param int $edituserid
      * @return object
      * @throws dml_exception
      */
-    protected function create_comment($questionid, $userid, $parentid = 0, $delete = 0, $deleteuserid = 0) {
+    protected function create_comment($questionid, $userid, $parentid = 0, $delete = 0, $deleteuserid = 0, $edit = 0,
+        $edituserid = 0) {
         global $DB;
 
         $data = (object) [
@@ -908,21 +933,47 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
                 'userid' => $userid,
                 'created' => rand(1000000000, 2000000000),
                 'parentid' => $parentid,
-                'deleted' => $delete === 1 ? rand(1000000000, 2000000000) : 0,
-                'deleteuserid' => $deleteuserid > 0 ? $deleteuserid : null
+                'status' => $delete === true ? utils::COMMENT_HISTORY_DELETE : utils::COMMENT_HISTORY_CREATE,
+                'timemodified' => rand(1000000000, 2000000000),
+                'usermodified' => $edituserid > 0 ? $edituserid : $userid
         ];
 
         $data->id = $DB->insert_record('studentquiz_comment', $data);
 
-        return $data;
+        return $DB->get_record('studentquiz_comment', ['id' => $data->id]);
+    }
+
+    /**
+     * Create comment history data for given user and comment.
+     *
+     * @param int $commentid Comment id
+     * @param int $userid Userid
+     * @param bool $delete Is deleted or not
+     * @return object
+     */
+    protected function create_comment_history($commentid, $userid, $delete = false) {
+        global $DB;
+
+        $data = (object) [
+                'id' => 0,
+                'commentid' => $commentid,
+                'content' => 'Sample comment ' . rand(1, 1000),
+                'userid' => $userid,
+                'action' => $delete === true ? utils::COMMENT_HISTORY_DELETE : utils::COMMENT_HISTORY_CREATE,
+                'timemodified' => rand(1000000000, 2000000000)
+        ];
+
+        $data->id = $DB->insert_record('studentquiz_comment_history', $data);
+
+        return $DB->get_record('studentquiz_comment_history', ['id' => $data->id]);
     }
 
     /**
      * Create progress data for user.
      *
-     * @param $questionid
-     * @param $userid
-     * @param $studentquizid
+     * @param int $questionid
+     * @param int $userid
+     * @param int $studentquizid
      * @return object
      * @throws dml_exception
      */
@@ -944,11 +995,11 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
     }
 
     /**
-     * Creat attempt data for user.
+     * Create attempt data for user.
      *
-     * @param $studentquizid
-     * @param $userid
-     * @param $categoryid
+     * @param int $studentquizid
+     * @param int $userid
+     * @param int $categoryid
      * @return object
      * @throws dml_exception
      */
@@ -969,24 +1020,24 @@ class mod_studentquiz_privacy_testcase extends provider_testcase {
     }
 
     /**
-     * Create practice data for user.
+     * Create notification data for user.
      *
-     * @param $studentquizcoursemodule
-     * @param $userid
+     * @param int $studentquizid
+     * @param int $userid
      * @return object
      * @throws dml_exception
      */
-    protected function create_practice($studentquizcoursemodule, $userid) {
+    protected function create_notification($studentquizid, $userid) {
         global $DB;
 
         $data = (object) [
                 'id' => 0,
-                'quizcoursemodule' => 1,
-                'studentquizcoursemodule' => $studentquizcoursemodule,
-                'userid' => $userid
+                'studentquizid' => $studentquizid,
+                'recipientid' => $userid,
+                'content' => 'Sample content ' . rand(1, 1000),
         ];
 
-        $data->id = $DB->insert_record('studentquiz_practice', $data);
+        $data->id = $DB->insert_record('studentquiz_notification', $data);
 
         return $data;
     }

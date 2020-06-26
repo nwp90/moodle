@@ -90,6 +90,7 @@ class delete_comment_api extends external_api {
         ));
 
         list($question, $cm, $context, $studentquiz) = utils::get_data_for_comment_area($params['questionid'], $params['cmid']);
+        self::validate_context($context);
         $commentarea = new container($studentquiz, $question, $cm, $context);
 
         $comment = $commentarea->query_comment_by_id($params['commentid']);
@@ -122,6 +123,9 @@ class delete_comment_api extends external_api {
             $response->success = false;
             $response->message = \get_string('invalidcomment', 'studentquiz');
         }
+
+        // Create history.
+        utils::create_comment_history($comment, utils::COMMENT_HISTORY_DELETE);
 
         return $response;
     }

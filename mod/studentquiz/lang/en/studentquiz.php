@@ -47,14 +47,18 @@ $string['before_answering_end_date'] = 'This StudentQuiz closes for answering on
 $string['before_answering_start_date'] = 'Open for answering from {$a}.';
 $string['before_submission_end_date'] = 'This StudentQuiz closes for question submission on {$a}.';
 $string['before_submission_start_date'] = 'Open for question submission from {$a}.';
+$string['cannotcapturecommenthistory'] = 'Can not capture comment history record';
 $string['changeselectedsstate'] = 'Change the state of the following questions:<br /><br />{$a}';
 $string['collapseall'] = 'Collapse all comments';
 $string['collapsecomment'] = 'Collapse comment';
+$string['comment_author'] = 'Author';
 $string['comment_column_name'] = 'Comments';
+$string['comment_cannot_update'] = 'Cannot update comment';
 $string['comment_error'] = 'Please comment';
 $string['comment_error_unsaved'] = 'Do you want to save this comment first?';
 $string['comment_help'] = 'Write a comment';
 $string['comment_help_help'] = 'Write a comment to the question';
+$string['commenthistory'] = 'Comment history';
 $string['comment_veryshort'] = 'C';
 $string['confirmdeletecomment'] = 'Are you sure you want to delete this comment?';
 $string['createnewquestion'] = 'Create new question';
@@ -72,20 +76,11 @@ $string['deletedcomment'] = 'Comment deleted.';
 $string['describe_already_deleted'] = 'This comment is already deleted.';
 $string['describe_not_creator'] = 'This is not your comment.';
 $string['describe_out_of_time_delete'] = 'This comment is out of time to delete';
-$string['emailapprovedbody'] = 'Dear {$a->recepientname},
-
-Your question \'{$a->questionname}\' in StudentQuiz activity \'{$a->modulename}\' in course \'{$a->coursename}\' has been approved by \'{$a->actorname}\' at \'{$a->timestamp}\'.
-
-You can review this question at: {$a->questionurl}.';
-$string['emailapprovedsmall'] = 'Your question \'{$a->questionname}\' has been approved by {$a->actorname}.';
-$string['emailapprovedsubject'] = 'Question has been approved: {$a->questionname}';
-$string['emailchangedbody'] = 'Dear {$a->recepientname},
-
-Your question \'{$a->questionname}\' in StudentQuiz activity \'{$a->modulename}\' in course \'{$a->coursename}\' has been modified by \'{$a->actorname}\' at \'{$a->timestamp}\'.
-
-You can review this question at: {$a->questionurl}.';
-$string['emailchangedsmall'] = 'Your question \'{$a->questionname}\' has been modified by {$a->actorname}.';
-$string['emailchangedsubject'] = 'Question has been modified: {$a->questionname}';
+$string['describe_out_of_time_edit'] = 'This comment is out of time to edit';
+$string['editcomment'] = 'Edit comment';
+$string['emailautomationnote'] = 'Please note that this is an automated system message – this email address is not monitored.';
+$string['editedcommenthistory'] = 'Edited by the {$a->lastesteditedcommentauthorname} on {$a->lastededitedcommenttime}';
+$string['editedcommenthistorylinktext'] = 'History';
 $string['emailcommentaddedbody'] = 'Dear {$a->recepientname},
 
 Your question \'{$a->questionname}\' in StudentQuiz activity \'{$a->modulename}\' in course \'{$a->coursename}\' has been commented by \'{$a->actorname}\' at \'{$a->timestamp}\'.
@@ -105,11 +100,6 @@ The comment was: \'{$a->commenttext}\'
 You can review this question at: {$a->questionurl}.';
 $string['emailcommentdeletedsmall'] = 'The comment to your question \'{$a->questionname}\' has been deleted by {$a->actorname}.';
 $string['emailcommentdeletedsubject'] = 'Comment has been deleted to question: {$a->questionname}';
-$string['emaildeletedbody'] = 'Dear {$a->recepientname},
-
-Your question \'{$a->questionname}\' in StudentQuiz activity \'{$a->modulename}\' in course \'{$a->coursename}\' has been deleted by \'{$a->actorname}\' at \'{$a->timestamp}\'.';
-$string['emaildeletedsmall'] = 'Your question \'{$a->questionname}\' has been deleted by {$a->actorname}.';
-$string['emaildeletedsubject'] = 'Question has been deleted: {$a->questionname}';
 $string['emailminecommentdeletedbody'] = 'Dear {$a->recepientname},
 
 Your comment on \'{$a->commenttime}\' to the question \'{$a->questionname}\' in StudentQuiz activity \'{$a->modulename}\' in course \'{$a->coursename}\' has been deleted by \'{$a->actorname}\' at \'{$a->timestamp}\'.
@@ -119,30 +109,13 @@ The comment was: \'{$a->commenttext}\'
 You can review this question at: {$a->questionurl}.';
 $string['emailminecommentdeletedsmall'] = 'Your comment to question \'{$a->questionname}\' has been deleted by {$a->actorname}.';
 $string['emailminecommentdeletedsubject'] = 'Comment has been deleted to question: {$a->questionname}';
-$string['emaildisapprovedbody'] = 'Dear {$a->recepientname},
-
-Your question \'{$a->questionname}\' in StudentQuiz activity \'{$a->modulename}\' in course \'{$a->coursename}\' has been disapproved by \'{$a->actorname}\' at \'{$a->timestamp}\'.
-
-You can review this question at: {$a->questionurl}.';
-$string['emaildisapprovedsmall'] = 'Your question \'{$a->questionname}\' has been disapproved by {$a->actorname}.';
-$string['emaildisapprovedsubject'] = 'Question has been disapproved: {$a->questionname}';
-
-$string['emailhiddenbody'] = 'Dear {$a->recepientname},
-
-Your question \'{$a->questionname}\' in StudentQuiz activity \'{$a->modulename}\' in course \'{$a->coursename}\' has been hidden by \'{$a->actorname}\' at \'{$a->timestamp}\'.
-
-You can review this question at: {$a->questionurl}.';
-$string['emailhiddensmall'] = 'Your question \'{$a->questionname}\' has been hidden by {$a->actorname}.';
-$string['emailhiddensubject'] = 'Question has been hidden: {$a->questionname}';
-
-$string['emailunhiddenbody'] = 'Dear {$a->recepientname},
-
-Your question \'{$a->questionname}\' in StudentQuiz activity \'{$a->modulename}\' in course \'{$a->coursename}\' has been unhidden by \'{$a->actorname}\' at \'{$a->timestamp}\'.
-
-You can review this question at: {$a->questionurl}.';
-$string['emailunhiddensmall'] = 'Your question \'{$a->questionname}\' has been unhidden by {$a->actorname}.';
-$string['emailunhiddensubject'] = 'Question has been unhidden: {$a->questionname}';
-
+$string['emailsinglebody'] = 'Your question <b>{$a->questionname}</b> in StudentQuiz activity <b>{$a->modulename}</b> in course <b>{$a->coursename}</b> has been {$a->eventname} by <b>{$a->actorname}</b> at <b>{$a->timestamp}</b>.';
+$string['emailsinglebody_reviewlink'] = 'You can review this question at: ';
+$string['emaildigestbody'] = 'This is your {$a->digesttype} digest of notifications for the <b>{$a->modulename}</b> StudentQuiz activity, available here: ';
+$string['emaildigestbody_section_title'] = 'Notification {$a->seq}, {$a->timestamp}';
+$string['emaildigestbody_section_content'] = 'Your question <b>{$a->questionname}</b> has been <b>{$a->actiontype}</b> by <b>{$a->actorname}</b>';
+$string['emaildigestsubject'] = 'StudentQuiz Digest Notification';
+$string['emailsalutation'] = 'Dear {$a},';
 $string['editorplaceholder'] = 'Enter your comment here ...';
 $string['error_form_validation'] = '{$a}';
 $string['error_sendalert'] = 'There was an error sending your report to {$a}.
@@ -179,7 +152,6 @@ $string['filter_label_onlymine'] = 'Mine';
 $string['filter_label_onlymine_help'] = 'Questions you created.';
 $string['filter_label_onlynew'] = 'Unanswered';
 $string['filter_label_onlynew_help'] = 'Questions you have never answered before';
-$string['filter_label_practice'] = 'Attempts';
 $string['filter_label_question'] = 'Question title';
 $string['filter_label_questiontext'] = 'Question content';
 $string['filter_label_question_creation_item'] = '{$a->creationtext} {$a->rowtext} {$a->inputtext}';
@@ -198,14 +170,9 @@ $string['lastattempt_wrong_label'] = 'Last attempt incorrect';
 $string['latest_column_name'] = 'Latest';
 $string['manager_anonym_fullname'] = 'Anonymous Manager';
 $string['message'] = 'Message';
-$string['messageprovider:approved'] = 'Question approved notification';
-$string['messageprovider:changed'] = 'Question changed notification';
+$string['messageprovider:questionchanged'] = 'Question event notification';
 $string['messageprovider:commentadded'] = 'Comment added notification';
 $string['messageprovider:commentdeleted'] = 'Comment deleted notification';
-$string['messageprovider:deleted'] = 'Question deleted notification';
-$string['messageprovider:disapproved'] = 'Question disapproved notification';
-$string['messageprovider:hidden'] = 'Question hidden notification';
-$string['messageprovider:unhidden'] = 'Question unhidden notification';
 $string['messageprovider:minecommentdeleted'] = 'My comment deleted notification';
 $string['migrate_already_done'] = 'Nothing was done because this activity has been migrated already!';
 $string['migrate_ask'] = 'The speed of StudentQuiz improved with version 3.2.1, but this question set is still based on a prior version.
@@ -227,17 +194,16 @@ $string['mylastattempt_column_name'] = 'My Last Attempt';
 $string['myrate_column_name'] = 'My Rating';
 $string['nav_export'] = 'Export';
 $string['nav_import'] = 'Import';
+$string['nav_question_no'] = 'Question {$a->current} of {$a->total}';
 $string['needtoallowatleastoneqtype'] = 'You need to allow at least one question type';
 $string['next_button'] = 'Next';
+$string['nocommenthistoryexist'] = 'There is no comment history yet for this comment.';
 $string['no_comment'] = 'n.a.';
 $string['no_comments'] = 'No comments';
 $string['no_difficulty_level'] = 'n.a.';
 $string['no_myattempts'] = 'n.a.';
-$string['no_mydifficulty'] = 'n.a.';
 $string['no_mylastattempt'] = 'n.a.';
 $string['no_mylastattempt_label'] = 'The question is not attempted';
-$string['no_myrate'] = 'n.a.';
-$string['no_practice'] = 'n.a.';
 $string['no_questions_add'] = 'There are no questions in this StudentQuiz. Feel free to add some questions.';
 $string['no_questions_filter'] = 'None of the questions matched your filter criteria. Reset the filter to see all.';
 $string['no_questions_selected_message'] = 'Please select at least one question to start the quiz.';
@@ -252,7 +218,6 @@ $string['pagesize'] = 'Page size:';
 $string['please_enrole_message'] = 'Please enroll in this course to see your personal progress';
 $string['pluginadministration'] = 'StudentQuiz Administration';
 $string['pluginname'] = 'StudentQuiz';
-$string['practice_column_name'] = 'Attempts';
 $string['previous_button'] = 'Previous';
 $string['privacy:metadata:studentquiz_attempt'] = 'Represents a users attempt to answer a set of questions.';
 $string['privacy:metadata:studentquiz_attempt:categoryid'] = 'ID of the category.';
@@ -267,12 +232,24 @@ $string['privacy:metadata:studentquiz_comment:userid'] = 'ID of the user.';
 $string['privacy:metadata:studentquiz_comment:parentid'] = 'ID of parent comment. 0: top level comment.';
 $string['privacy:metadata:studentquiz_comment:deleted'] = 'Time deleted time comment.';
 $string['privacy:metadata:studentquiz_comment:deleteuserid'] = 'ID of the user deleted comment.';
+$string['privacy:metadata:studentquiz_comment:edited'] = 'Time edited time comment.';
+$string['privacy:metadata:studentquiz_comment:edituserid'] = 'ID of the user edited comment.';
+$string['privacy:metadata:studentquiz_comment:status'] = 'Status of comment';
+$string['privacy:metadata:studentquiz_comment:timemodified'] = 'Comment modified time';
+$string['privacy:metadata:studentquiz_comment:usermodified'] = 'ID of comment modified user';
+$string['privacy:metadata:studentquiz_comment_history:commentid'] = 'ID of comment';
+$string['privacy:metadata:studentquiz_comment_history:content'] = 'Comment history content';
+$string['privacy:metadata:studentquiz_comment_history:userid'] = 'ID of user that edit comment';
+$string['privacy:metadata:studentquiz_comment_history:action'] = 'Type of history 0 - Create | 1 - Edit | 2 - Delete';
+$string['privacy:metadata:studentquiz_comment_history:timemodified'] = 'Modified time of comment';
+$string['privacy:metadata:studentquiz_comment_history'] = 'Store comment histories of comments';
 $string['privacy:metadata:mod_studentquiz_comment_sort'] = 'A user preference for comment filter type.';
-
-$string['privacy:metadata:studentquiz_practice'] = 'Store quiz practices.';
-$string['privacy:metadata:studentquiz_practice:quizcoursemodule'] = 'Quiz course module.';
-$string['privacy:metadata:studentquiz_practice:studentquizcoursemodule'] = 'StudentQuiz course module.';
-$string['privacy:metadata:studentquiz_practice:userid'] = 'ID of the user.';
+$string['privacy:metadata:studentquiz_notification'] = 'Notification queue';
+$string['privacy:metadata:studentquiz_notification:studentquizid'] = 'StudentQuiz ID';
+$string['privacy:metadata:studentquiz_notification:content'] = 'Notification content';
+$string['privacy:metadata:studentquiz_notification:recipientid'] = 'Recipient ID';
+$string['privacy:metadata:studentquiz_notification:status'] = 'Status of the notification';
+$string['privacy:metadata:studentquiz_notification:timetosend'] = 'Time to send the notification';
 $string['privacy:metadata:studentquiz_progress'] = 'Store progress information of student with this question.';
 $string['privacy:metadata:studentquiz_progress:attempts'] = 'Number of attempts to answer this question.';
 $string['privacy:metadata:studentquiz_progress:correctattempts'] = 'Number of correct answers.';
@@ -394,6 +371,8 @@ $string['report_comment_emailappendix'] = 'You are receiving this email because 
 used on the StudentQuiz for reporting unacceptable comment.';
 $string['report_comment_link_text'] = 'Preview here';
 $string['review_button'] = 'Review';
+$string['savechanges'] = 'Save changes';
+$string['scheduled_task_send_digest_notification'] = 'Send digest notification';
 $string['settings_allowallqtypes'] = 'Allow all question types';
 $string['settings_allowedqtypes'] = 'Allowed question types';
 $string['settings_allowedqtypes_help'] = 'Limit the allowed question types to the selected entries';
@@ -407,6 +386,15 @@ $string['settings_availability_close_answering_from'] = 'Closed for answering fr
 $string['settings_availability_close_submission_from'] = 'Closed for question submission from';
 $string['settings_availability_open_answering_from'] = 'Open for answering from';
 $string['settings_availability_open_submission_from'] = 'Open for question submission from';
+$string['settings_comment_editor_toolbar'] = 'Comment editor toolbar config';
+$string['settings_comment_editor_toolbar_des'] = 'The list of plugins and the order they are displayed can be configured here';
+$string['settings_email_digest_type'] = 'Email digest type';
+$string['settings_email_digest_type_help'] = 'StudentQuiz has various notifications that you can enable, such as informing the student question-author of a state change (e.g. a teacher has approved one of their questions). You can use this setting to specify the frequency of these notifications. Digest emails will only be sent when there is at least one notification in the set period';
+$string['settings_email_digest_type_no_digest'] = 'No digest (single email per action)';
+$string['settings_email_digest_type_daily_digest'] = 'Daily digest';
+$string['settings_email_digest_type_weekly_digest'] = 'Weekly digest';
+$string['settings_email_digest_first_day'] = 'First day of week?';
+$string['settings_email_digest_first_day_help'] = 'If you have selected a weekly digest, this option allows you to define the first day (beginning at 00h:00m:00s of that day) of the seven day period. This is especially useful if the activity starts mid-week, for example.';
 $string['settings_excluderoles'] = 'Exclude roles in ranking';
 $string['settings_excluderoles_label'] = 'Roles in ranking to exclude';
 $string['settings_excluderoles_help'] = 'Selected roles are hidden in the rankings, enrolled users in these roles can still participate normally in the activity';
@@ -420,12 +408,10 @@ $string['settings_lastcorrectanswerquantifier_label'] = 'Points for latest corre
 $string['settings_lastincorrectanswerquantifier'] = 'Latest wrong answer factor';
 $string['settings_lastincorrectanswerquantifier_help'] = 'Points for each wrong or partially wrong answer on the last attempt';
 $string['settings_lastincorrectanswerquantifier_label'] = 'Points for latest wrong answers';
+$string['settings_notification'] = 'Notification settings';
 $string['settings_questionquantifier'] = 'Created question factor';
 $string['settings_questionquantifier_help'] = 'Points for each created question';
 $string['settings_questionquantifier_label'] = 'Points for each question created';
-$string['settings_quizpracticebehaviour'] = 'Rating and commenting';
-$string['settings_quizpracticebehaviour_help'] = 'Allow students to rate and comment questions during the quiz attempt';
-$string['settings_quizpracticebehaviour_label'] = 'Rating and commenting';
 $string['settings_ratequantifier'] = 'Rating factor';
 $string['settings_ratequantifier_help'] = 'Points for each star received.';
 $string['settings_ratequantifier_label'] = 'Multiplier for the average of stars received for a question';
@@ -434,14 +420,14 @@ $string['settings_removeqbehavior_help'] = 'This info should appear only once du
 $string['settings_removeqbehavior_label'] = 'Remove question behavior plugin StudentQuiz';
 $string['settings_section_description_default'] = 'These values define the default values when creating a new studentquiz activity.';
 $string['settings_section_header_question'] = 'Question settings';
-$string['settings_section_header_comment'] = 'Comment settings';
+$string['settings_section_header_comment_rating'] = 'Comment and rating settings';
 $string['settings_section_header_ranking'] = 'Ranking settings';
 $string['setting_question_publishing'] = 'Question publishing';
-$string['setting_question_publishing_help'] = 'Published questions appear in the question pool for other students to take them. Either allow all questions to be published automatically, or require approval before they can be published.<br>Note that this setting cannot be changed once a question has been created in the StudentQuiz.';
+$string['setting_question_publishing_help'] = 'Published questions appear in the question pool for other students to take them. Either allow all questions to be published automatically, or require approval before they can be published.<br>Note that this setting only applies to newly created questions.';
 $string['setting_question_publishing_automatic'] = 'Automatically publish new questions';
 $string['setting_question_publishing_require_approval'] = 'Require approval before publishing';
-$string['settings_commentdeletionperiod'] = 'Comment deletion period (minutes)';
-$string['settings_commentdeletionperiod_help'] = 'Set the time period (in minutes) that the Delete button will be available to students to delete their own comment (or response to a comment) once it is posted. Values between 0-60 minutes are allowed, with the default being 10. If the deletion period is set to 0, students are unable to delete their own comments. Note that teachers and administrators will always be able to delete student comments, and also see the content of any deleted comment.';
+$string['settings_commentdeletionperiod'] = 'Comment editing/deletion period (minutes)';
+$string['settings_commentdeletionperiod_help'] = 'Set the time period (in minutes) that the Edit/Delete button will be available to students to edit/delete their own comment (or response to a comment) once it is posted. Values between 0-60 minutes are allowed. If the deletion period is set to 0, students are unable to edit/delete their own comments. Note that teachers and administrators will always be able to edit/delete student comments, and also see the content of any deleted comment.';
 $string['settings_reportingemail'] = 'Email for reporting offensive comments';
 $string['settings_reportingemail_help'] = 'If this email address is supplied, then a Report link appears
 next to each comment. Users can click the link to report offensive comments. The information will be sent to this address.
@@ -476,11 +462,9 @@ $string['statistic_block_progress_never'] = 'Questions never answered';
 $string['statistic_block_title'] = 'My Progress';
 $string['studentquiz'] = 'studentquiz';
 $string['studentquiz:addinstance'] = 'Add new instance for StudentQuiz';
-$string['studentquiz:emailnotifyapproved'] = 'Question approved notification';
-$string['studentquiz:emailnotifychanged'] = 'Question changed notification';
 $string['studentquiz:emailnotifycommentadded'] = 'Comment added notification';
 $string['studentquiz:emailnotifycommentdeleted'] = 'Comment deleted notification';
-$string['studentquiz:emailnotifydeleted'] = 'Question deleted notification';
+$string['studentquiz:emailnotifyquestion'] = 'Question event notification';
 $string['studentquiz:manage'] = 'Moderate questions on StudentQuiz';
 $string['studentquiz:previewothers'] = 'Preview questions of others on StudentQuiz';
 $string['studentquiz:submit'] = 'Submit questions on StudentQuiz';
