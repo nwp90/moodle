@@ -94,6 +94,44 @@ function xmldb_assignsubmission_gradereviews_upgrade($oldversion) {
         upgrade_plugin_savepoint(true, 2016042207, 'assignsubmission', 'gradereviews');
     }
 
+    if ($oldversion == 2017060600) {
+
+        // Update all capability to new one.
+        $oldcap = $DB->get_record('capabilities', array('name' => 'assignsubmission/gradereviews:canreviewgrade'));
+        $oldcap->name = 'assign/submission:canreviewgrade';
+        $oldcap->component = 'assignsubmission_gradereviews';
+        $DB->update_record('capabilities', $oldcap);
+
+        $oldcap = $DB->get_record('capabilities', array('name' => 'assignsubmission/gradereviews:caneditreviewgrade'));
+        $oldcap->name = 'assign/submission:caneditreviewgrade';
+        $oldcap->component = 'assignsubmission_gradereviews';
+        $DB->update_record('capabilities', $oldcap);
+
+        // Update all role_capability to new one.
+        $oldcaps = $DB->get_records('role_capabilities', array('capability' => 'assignsubmission/gradereviews:canreviewgrade'));
+        if (!empty($oldcaps)) {
+            foreach ($oldcaps as $oldcap) {
+                $oldcap->capability = 'assign/submission:canreviewgrade';
+                $DB->update_record('role_capabilities', $oldcap);
+            }
+        }
+
+        $oldeditcaps = $DB->get_records('role_capabilities', array('capability' => 'assignsubmission/gradereviews:caneditreviewgrade'));
+        if (!empty($oldeditcaps)) {
+            foreach ($oldeditcaps as $oldcap) {
+                $oldcap->capability = 'assign/submission:caneditreviewgrade';
+                $DB->update_record('role_capabilities', $oldcap);
+            }
+        }
+
+        // Assign submission savepoint reached.
+	// Actually for version 2018102600 but we don't want to get ahead of any possible future
+	// version between 2016042207 and that if we can avoid it
+	// With luck we can migrate to standard plugin either next update or at least next time
+	// they add a later savepoint.
+        upgrade_plugin_savepoint(true, 2017060601, 'assignsubmission', 'gradereviews');
+    }
+
     return true;
 }
 
