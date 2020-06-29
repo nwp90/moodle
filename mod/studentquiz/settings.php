@@ -22,6 +22,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+use mod_studentquiz\utils;
+
 defined('MOODLE_INTERNAL') || die;
 
 require_once(__DIR__ . '/locallib.php');
@@ -125,11 +127,17 @@ if ($ADMIN->fulltree) {
         '0'
     ));
 
-    $settings->add(new admin_setting_configselect('studentquiz/commentdeletionperiod',
+    $settings->add(new admin_setting_configselect('studentquiz/commentediting_deletionperiod',
             get_string('settings_commentdeletionperiod', 'studentquiz'),
             get_string('settings_commentdeletionperiod_help', 'studentquiz'),
             \mod_studentquiz\commentarea\container::DELETION_PERIOD_DEFAULT,
             \mod_studentquiz\commentarea\container::get_deletion_period_options()
+    ));
+
+    $settings->add(new admin_setting_configtextarea('studentquiz/comment_editor_toolbar',
+            get_string('settings_comment_editor_toolbar', 'studentquiz'),
+            get_string('settings_comment_editor_toolbar_des', 'studentquiz'),
+            utils::ATTO_TOOLBAR
     ));
 
 }

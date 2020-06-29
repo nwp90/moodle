@@ -26,7 +26,10 @@ Links
 
 Changes
 -------
-Release 0.9 (build 2016041601):
-- Initial release.
-Release 1.0 (build 2016051000):
-- Double capability check.
+- Release 0.9 (build 2016041601):
+    - Initial release.
+- Release 1.0 (build 2016051000):
+    - Double capability check.
+- Release 1.1 (build 2020061300):
+    - Privacy API support.
+    - Question bank tabs.

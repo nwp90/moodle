@@ -57,7 +57,7 @@ Feature: Question states and visibility
     And I follow "StudentQuiz Test 2"
     And I should see "TF 01"
 
-  @javascript
+  @javascript @_switch_window
   Scenario: Test filter
     Given I log in as "student1"
     And I am on "Course 1" course homepage
@@ -99,19 +99,19 @@ Feature: Question states and visibility
     And I click on "Preview" "link" in the "TF 01" "table_row"
     And I switch to "questionpreview" window
     And I set the field "statetype" to "Disapproved"
-    And I click on "Submit" "button"
+    And I click on "Change state" "button"
     And I switch to the main window
 
     And I click on "Preview" "link" in the "TF 02" "table_row"
     And I switch to "questionpreview" window
     And I set the field "statetype" to "Approved"
-    And I click on "Submit" "button"
+    And I click on "Change state" "button"
     And I switch to the main window
 
     And I click on "Preview" "link" in the "TF 03" "table_row"
     And I switch to "questionpreview" window
     And I set the field "statetype" to "Changed"
-    And I click on "Submit" "button"
+    And I click on "Change state" "button"
     And I switch to the main window
 
     And I click on "//a[text() = 'New']" "xpath_element"
@@ -166,7 +166,7 @@ Feature: Question states and visibility
     And I log in as "admin"
     And I am on "Course 1" course homepage
     And I follow "StudentQuiz Test 1"
-    And I click on "Restore" "link" in the "TF 01" "table_row"
+    And I click on "Show" "link" in the "TF 01" "table_row"
     And I log out
     And I log in as "student1"
     And I am on "Course 1" course homepage
@@ -174,7 +174,7 @@ Feature: Question states and visibility
     And I should see "TF 01"
     And "Hide" "link" should not exist in the "TF 01" "table_row"
 
-  @javascript
+  @javascript @_switch_window
   Scenario: Test Studentquiz cannot edit approved/disapproved question
     Given I log in as "student1"
     And I am on "Course 1" course homepage
@@ -204,13 +204,13 @@ Feature: Question states and visibility
     And I click on "Preview" "link" in the "TF 01" "table_row"
     And I switch to "questionpreview" window
     And I set the field "statetype" to "Approved"
-    And I click on "Submit" "button"
+    And I click on "Change state" "button"
     And I switch to the main window
 
     And I click on "Preview" "link" in the "TF 02" "table_row"
     And I switch to "questionpreview" window
     And I set the field "statetype" to "Disapproved"
-    And I click on "Submit" "button"
+    And I click on "Change state" "button"
     And I switch to the main window
 
     And I log out
@@ -220,25 +220,3 @@ Feature: Question states and visibility
 
     And "Edit" "link" should not exist in the "TF 01" "table_row"
     And "Edit" "link" should not exist in the "TF 02" "table_row"
-
-  @javascript
-  Scenario: Test question publishing setting will be disabled once a question has been created
-    Given I log in as "admin"
-    And I am on "Course 1" course homepage
-    And I follow "StudentQuiz Test 1"
-    And I navigate to "Edit settings" in current page administration
-    When I expand all fieldsets
-    Then I should see "Question publishing"
-    And the "Question publishing" select box should contain "Automatically publish new questions"
-    And the "Question publishing" select box should contain "Require approval before publishing"
-    And the "Question publishing" "select" should be enabled
-    And I click on "Cancel" "button"
-    And I click on "Create new question" "button"
-    And I set the field "item_qtype_truefalse" to "1"
-    And I click on "Add" "button" in the "Choose a question type to add" "dialogue"
-    And I set the field "Question name" to "TF 01"
-    And I set the field "Question text" to "The correct answer is false"
-    And I press "id_submitbutton"
-    And I navigate to "Edit settings" in current page administration
-    When I expand all fieldsets
-    Then the "Question publishing" "select" should be disabled

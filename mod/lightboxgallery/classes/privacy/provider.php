@@ -187,15 +187,15 @@ class provider implements
         }
 
         $sql = "SELECT lbgc.userid
-                FROM {context} c
-                JOIN {course_modules} cm ON cm.id = c.instanceid AND c.contextlevel = :contextlevel
+                FROM {course_modules} cm
                 JOIN {modules} m ON m.id = cm.module AND m.name = :modname
                 JOIN {lightboxgallery} lbg ON lbg.id = cm.instance
-                JOIN {lightboxgallery_comments} lbgc ON lbgc.gallery = lbg.id";
+                JOIN {lightboxgallery_comments} lbgc ON lbgc.gallery = lbg.id
+                WHERE cm.id = :instanceid";
 
         $params = [
             'modname'       => 'lightboxgallery',
-            'contextlevel'  => \CONTEXT_MODULE,
+            'instanceid'    => $context->instanceid,
         ];
 
         $userlist->add_from_sql('userid', $sql, $params);

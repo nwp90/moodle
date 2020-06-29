@@ -77,12 +77,6 @@ class mod_studentquiz_mod_form extends moodleform_mod {
             $this->add_intro_editor();
         }
 
-        // Field total questions.
-        $mform->addElement('hidden', 'totalquestions',
-                \mod_studentquiz\local\studentquiz_helper::get_studentquiz_total_questions($this->get_coursemodule(),
-                        $this->get_context()->id));
-        $mform->setType('totalquestions', PARAM_INT);
-
         // Field question publishing.
         $publishingoptions = [
                 1 => get_string('setting_question_publishing_automatic', 'studentquiz'),
@@ -93,7 +87,6 @@ class mod_studentquiz_mod_form extends moodleform_mod {
         $mform->addHelpButton('publishnewquestion', 'setting_question_publishing', 'studentquiz');
         $mform->setType('publishnewquestion', PARAM_INT);
         $mform->setDefault('publishnewquestion', 1);
-        $mform->disabledIf('publishnewquestion', 'totalquestions', 'neq', 0);
 
         $mform->addElement('header', 'sectionranking', get_string('settings_section_header_ranking', 'studentquiz'));
 
@@ -184,16 +177,16 @@ class mod_studentquiz_mod_form extends moodleform_mod {
         $mform->disabledIf('allowedqtypes', "allowedqtypes[ALL]", 'checked');
         $mform->addHelpButton('allowedqtypes', 'settings_allowedqtypes', 'studentquiz');
 
+        // Comment and rating sections.
+        $mform->addElement('header', 'sectioncomment', get_string('settings_section_header_comment_rating', 'studentquiz'));
+
         // Field force rating.
         $mform->addElement('checkbox', 'forcerating', get_string('settings_forcerating', 'studentquiz'));
         $mform->setType('forcerating', PARAM_INT);
         $mform->addHelpButton('forcerating', 'settings_forcerating', 'studentquiz');
         $mform->setDefault('forcerating', get_config('studentquiz', 'forcerating'));
 
-        // Comment sections.
-        $mform->addElement('header', 'sectioncomment', get_string('settings_section_header_comment', 'studentquiz'));
-
-        // Field force commenting
+        // Field force commenting.
         $mform->addElement('checkbox', 'forcecommenting', get_string('settings_forcecommenting', 'studentquiz'));
         $mform->setType('forcecommenting', PARAM_INT);
         $mform->addHelpButton('forcecommenting', 'settings_forcecommenting', 'studentquiz');
@@ -206,7 +199,7 @@ class mod_studentquiz_mod_form extends moodleform_mod {
         );
         $mform->setType('commentdeletionperiod', PARAM_INT);
         $mform->addHelpButton('commentdeletionperiod', 'settings_commentdeletionperiod', 'studentquiz');
-        $mform->setDefault('commentdeletionperiod', get_config('studentquiz', 'commentdeletionperiod'));
+        $mform->setDefault('commentdeletionperiod', get_config('studentquiz', 'commentediting_deletionperiod'));
 
         // Email address for reporting unacceptable comment for this studentquiz, default is blank.
         $mform->addElement('text', 'reportingemail', get_string('settings_reportingemail', 'studentquiz'), ['size' => 64]);
@@ -224,6 +217,33 @@ class mod_studentquiz_mod_form extends moodleform_mod {
                 get_string('settings_availability_open_answering_from', 'studentquiz'), ['optional' => true]);
         $mform->addElement('date_time_selector', 'closeansweringfrom',
                 get_string('settings_availability_close_answering_from', 'studentquiz'), ['optional' => true]);
+
+        // Notification.
+        $mform->addElement('header', 'notification', get_string('settings_notification', 'studentquiz'));
+        // Field email digest type.
+        $digesttypes = [
+                0 => get_string('settings_email_digest_type_no_digest', 'studentquiz'),
+                1 => get_string('settings_email_digest_type_daily_digest', 'studentquiz'),
+                2 => get_string('settings_email_digest_type_weekly_digest', 'studentquiz')
+        ];
+        $mform->addElement('select', 'digesttype', get_string('settings_email_digest_type', 'studentquiz'),
+                $digesttypes);
+        $mform->addHelpButton('digesttype', 'settings_email_digest_type', 'studentquiz');
+
+        // Field first day of week.
+        $daysofweek = [
+                0 => get_string('sunday', 'calendar'),
+                1 => get_string('monday', 'calendar'),
+                2 => get_string('tuesday', 'calendar'),
+                3 => get_string('wednesday', 'calendar'),
+                4 => get_string('thursday', 'calendar'),
+                5 => get_string('friday', 'calendar'),
+                6 => get_string('saturday', 'calendar')
+        ];
+        $mform->addElement('select', 'digestfirstday', get_string('settings_email_digest_first_day', 'studentquiz'), $daysofweek);
+        $mform->addHelpButton('digestfirstday', 'settings_email_digest_first_day', 'studentquiz');
+        $mform->setDefault('digestfirstday', 1);
+        $mform->disabledIf('digestfirstday', 'digesttype', 'neq', 2);
 
         // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
@@ -281,6 +301,7 @@ class mod_studentquiz_mod_form extends moodleform_mod {
 
     /**
      * Validate string contains validate email or multiple emails.
+     *
      * @param string $emails - Example: test@gmail.com;test1@gmail.com.
      * @return bool
      */
@@ -295,6 +316,9 @@ class mod_studentquiz_mod_form extends moodleform_mod {
     }
 
     /**
+     * Return submitted data if properly submitted or returns NULL if validation fails or
+     * if there is no submitted data.
+     *
      * @return bool|object
      */
     public function get_data() {
@@ -307,4 +331,5 @@ class mod_studentquiz_mod_form extends moodleform_mod {
         }
         return $data;
     }
+
 }

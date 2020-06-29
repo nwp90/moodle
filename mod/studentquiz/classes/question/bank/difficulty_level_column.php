@@ -35,8 +35,13 @@ defined('MOODLE_INTERNAL') || die();
  */
 class difficulty_level_column extends \core_question\bank\column_base {
 
+    /**
+     * Renderer
+     * @var stdClass
+     */
     protected $renderer;
 
+    /** @var \stdClass */
     protected $studentquiz;
 
     /**
@@ -55,8 +60,6 @@ class difficulty_level_column extends \core_question\bank\column_base {
         $this->renderer = $PAGE->get_renderer('mod_studentquiz');
     }
 
-    protected $sqlparams = array();
-
     /**
      * Return name of column
      * @return string columnname
@@ -74,20 +77,13 @@ class difficulty_level_column extends \core_question\bank\column_base {
     }
 
     /**
-     * Get params that this join requires be added to the query.
-     * @return array sqlparams required to be added to query
-     */
-    public function get_sqlparams() {
-        return $this->sqlparams;
-    }
-
-    /**
      * Get sql query join for this column
      * @return array sql query join additional
      */
     public function get_extra_joins() {
             return array('dl' => "LEFT JOIN (
-                                              SELECT ROUND(1 - AVG(CAST(correctattempts AS DECIMAL) / CAST(attempts AS DECIMAL)), 2) AS difficultylevel,
+                                              SELECT ROUND(1 - AVG(CAST(correctattempts AS DECIMAL) /
+                                                       CAST(attempts AS DECIMAL)), 2) AS difficultylevel,
                                                      questionid
                                                 FROM {studentquiz_progress}
                                                WHERE studentquizid = " . $this->studentquizid . "
@@ -100,7 +96,8 @@ class difficulty_level_column extends \core_question\bank\column_base {
      * @return array fieldname in array
      */
     public function get_required_fields() {
-        return array('dl.difficultylevel', 'ROUND(1 - (CAST(sp.correctattempts AS DECIMAL) / CAST(sp.attempts  AS DECIMAL)),2) AS mydifficulty',
+        return array('dl.difficultylevel',
+            'ROUND(1 - (CAST(sp.correctattempts AS DECIMAL) / CAST(sp.attempts  AS DECIMAL)),2) AS mydifficulty',
             'sp.correctattempts AS mycorrectattempts');
     }
 

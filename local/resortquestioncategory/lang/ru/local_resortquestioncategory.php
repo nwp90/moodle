@@ -23,6 +23,7 @@
  */
 
 $string['pluginname'] = 'Сортировка категорий вопросов';
+$string['privacy:metadata'] = 'Плагин не хранит персональные данные.';
 $string['resortcategory'] = 'Сортировка категорий';
 $string['resortthiscategory'] = 'Отсортировать эту категорию';
 $string['selectcategory'] = 'Выберите категорию для сортировки';

@@ -46,7 +46,10 @@ $course = $report->get_course();
 $context = $report->get_context();
 $cm = $report->get_coursemodule();
 $studentquiz = mod_studentquiz_load_studentquiz($cmid, $context->id);
-mod_studentquiz_compare_questions_data($studentquiz);
+
+if ($CFG->branch < 37) { // Since Moodle 37 setting the question data is handled by event question_created.
+    mod_studentquiz_compare_questions_data($studentquiz);
+}
 
 // If for some weired reason a studentquiz is not aggregated yet, now would be a moment to do so.
 if (!$studentquiz->aggregated) {
@@ -79,7 +82,7 @@ $renderer->init_question_table_wanted_columns();
 $view = new mod_studentquiz_view($course, $context, $cm, $studentquiz, $USER->id, $report);
 
 // Since this page has 2 forms interacting with each other, all params must be passed in GET, thus
-// $PAGE->url will be as it has recieved the request
+// $PAGE->url will be as it has recieved the request.
 $PAGE->set_url($view->get_pageurl());
 $PAGE->set_title($view->get_title());
 $PAGE->set_heading($COURSE->fullname);
@@ -98,6 +101,7 @@ echo $renderer->render_overview($view);
 
 $PAGE->requires->js_init_code($renderer->render_bar_javascript_snippet(), true);
 $PAGE->requires->js_call_amd('mod_studentquiz/studentquiz', 'setFocus');
+$PAGE->requires->js_call_amd('mod_studentquiz/studentquiz', 'selectAllQuestions');
 $PAGE->requires->js_call_amd('mod_studentquiz/toggle_filter_checkbox', 'init');
 
 echo $OUTPUT->footer();
