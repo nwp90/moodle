@@ -1957,7 +1957,7 @@ class mod_attendance_renderer extends plugin_renderer_base {
                 'class' => 'btn btn-primary',
                 'value' => get_string('save', 'attendance'));
             $cell = new html_table_cell(html_writer::tag('center', html_writer::empty_tag('input', $params)));
-            $cell->colspan = $colcount + (($groupby == 'activity')? 2 : 1);
+            $cell->colspan = $colcount + (($groupby == 'activity') ? 2 : 1);
             $row->cells[] = $cell;
             $table->data[] = $row;
         }

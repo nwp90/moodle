@@ -357,7 +357,7 @@ class renderer_base {
      * @param int $maxheight The maximum height, or null when the maximum height does not matter.
      * @return moodle_url|false
      */
-    public function get_compact_logo_url($maxwidth = 100, $maxheight = 100) {
+    public function get_compact_logo_url($maxwidth = 300, $maxheight = 300) {
         global $CFG;
         $logo = get_config('core_admin', 'logocompact');
         if (empty($logo)) {
@@ -1047,7 +1047,7 @@ class core_renderer extends renderer_base {
         $course = $this->page->course;
         if (\core\session\manager::is_loggedinas()) {
             $realuser = \core\session\manager::get_realuser();
-            $fullname = fullname($realuser, true);
+            $fullname = fullname($realuser);
             if ($withlinks) {
                 $loginastitle = get_string('loginas');
                 $realuserinfo = " [<a href=\"$CFG->wwwroot/course/loginas.php?id=$course->id&amp;sesskey=".sesskey()."\"";
@@ -1068,7 +1068,7 @@ class core_renderer extends renderer_base {
         } else if (isloggedin()) {
             $context = context_course::instance($course->id);
 
-            $fullname = fullname($USER, true);
+            $fullname = fullname($USER);
             // Since Moodle 2.0 this link always goes to the public profile page (not the course profile page)
             if ($withlinks) {
                 $linktitle = get_string('viewprofile');

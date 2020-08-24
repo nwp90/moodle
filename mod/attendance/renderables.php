@@ -625,7 +625,7 @@ class attendance_user_data implements renderable {
         $updateatts = array();
         foreach ($sesslog as $stid => $userlog) {
             $dbstudlog = $DB->get_records('attendance_log', array('studentid' => $stid), '', 'sessionid,statusid,remarks,id,statusset');
-            foreach($userlog as $log) {
+            foreach ($userlog as $log) {
                 if (array_key_exists($log->sessionid, $dbstudlog)) {
                     $attid = $sessionatt[$log->sessionid];
                     // Check if anything important has changed before updating record.
@@ -663,7 +663,7 @@ class attendance_user_data implements renderable {
 
         if (!empty($updateatts)) {
             $attendancegrade = $DB->get_records_list('attendance', 'id', array_keys($updateatts), '', 'id, grade');
-            foreach($updateatts as $attid => $updateusers) {
+            foreach ($updateatts as $attid => $updateusers) {
                 if ($attendancegrade[$attid] != 0) {
                     attendance_update_users_grades_by_id($attid, $grade, $updateusers);
                 }
