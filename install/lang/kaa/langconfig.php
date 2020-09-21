@@ -30,16 +30,4 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$string['clianswerno'] = 'لا';
-$string['cliansweryes'] = 'نعم';
-$string['cliincorrectvalueerror'] = 'خطأ، القيمة "{$a->value}" غير صحيحة من أجل "{$a->option}"';
-$string['cliincorrectvalueretry'] = 'قيمة غير صحيحة، حاول مرة أخرى';
-$string['clitypevalue'] = 'أدخل القيمة';
-$string['clitypevaluedefault'] = 'أدخل القيمة أو إضغط مفتاح Enter لاستعمال القيمة الافتراضية ({$a})';
-$string['cliunknowoption'] = 'خيارات غير معروفة
-{$a}
-الرجاء استخدام خيار المساعدة';
-$string['cliyesnoprompt'] = 'أدخل y (وتعني نعم) أو n (وتعني لا)';
-$string['environmentrequireinstall'] = 'يجب تنصيبه/تمكينه';
-$string['environmentrequireversion'] = 'يتطلب الإصدار {$a->needed}، وأنت تستعمل الإصدار {$a->current}';
-$string['upgradekeyset'] = 'مفتاح التحديث (اتركها فارغة إن لم ترغب بتحديده)';
+$string['thislanguage'] = 'Qaraqalpaq tili';
